@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architect Quest — Junior to Senior</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --panel: #0d1525;
+    --panel2: #111d35;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --red: #ff4466;
+    --purple: #a855f7;
+    --text: #c8dff0;
+    --muted: #5a7a9a;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated starfield bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(1px 1px at 20% 30%, rgba(0,212,255,0.4), transparent),
+      radial-gradient(1px 1px at 80% 10%, rgba(255,215,0,0.3), transparent),
+      radial-gradient(1px 1px at 50% 80%, rgba(168,85,247,0.3), transparent),
+      radial-gradient(1px 1px at 10% 90%, rgba(0,255,136,0.2), transparent),
+      radial-gradient(1px 1px at 90% 60%, rgba(0,212,255,0.2), transparent);
+    background-size: 300px 300px, 500px 500px, 400px 400px, 600px 600px, 350px 350px;
+    animation: drift 30s linear infinite;
+    pointer-events: none; z-index: 0;
+  }
+  @keyframes drift { to { background-position: 300px 300px, -500px 500px, 400px -400px, -600px 600px, 350px -350px; } }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,12,20,0.95);
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  .logo span { font-size: 0.75rem; display: block; color: var(--muted); font-family: 'Rajdhani', sans-serif; -webkit-text-fill-color: var(--muted); }
+
+  /* PLAYER BAR */
+  .player-bar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 16px;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #1e3a5f, var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; border: 2px solid var(--accent);
+    box-shadow: 0 0 12px rgba(0,212,255,0.4);
+  }
+  .player-info { text-align: left; }
+  .player-name { font-weight: 700; font-size: 1rem; color: white; }
+  .player-rank { font-size: 0.8rem; color: var(--accent); font-family: 'Share Tech Mono'; }
+  .xp-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .xp-label { font-size: 0.75rem; color: var(--gold); font-family: 'Share Tech Mono'; white-space: nowrap; }
+  .xp-bar { width: 120px; height: 6px; background: #1a2a3a; border-radius: 3px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); border-radius: 3px; transition: width 0.8s ease; }
+
+  /* MAIN LAYOUT */
+  .main { position: relative; z-index: 5; display: grid; grid-template-columns: 260px 1fr; gap: 0; min-height: calc(100vh - 65px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: rgba(13,21,37,0.98);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    overflow-y: auto;
+  }
+  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+  .sidebar-title { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  /* SKILL TREE */
+  .skill-node {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    margin-bottom: 4px; cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .skill-node:hover { background: var(--panel2); border-color: var(--border); }
+  .skill-node.active { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.4); }
+  .skill-node.locked { opacity: 0.4; cursor: not-allowed; }
+  .skill-node.completed { border-color: rgba(0,255,136,0.3); }
+  .skill-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .skill-icon.c-cloud { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); }
+  .skill-icon.c-arch { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); }
+  .skill-icon.c-sec { background: rgba(255,68,102,0.1); border: 1px solid rgba(255,68,102,0.3); }
+  .skill-icon.c-net { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); }
+  .skill-icon.c-data { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); }
+  .skill-text { flex: 1; }
+  .skill-text .sname { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  .skill-text .sprog { font-size: 0.75rem; color: var(--muted); }
+  .skill-check { font-size: 0.8rem; }
+
+  /* CONTENT */
+  .content { padding: 24px; overflow-y: auto; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--panel); border-radius: 8px; padding: 4px; border: 1px solid var(--border); width: fit-content; }
+  .tab { padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; color: var(--muted); }
+  .tab.active { background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05)); color: var(--accent); border: 1px solid rgba(0,212,255,0.4); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* QUEST CARD */
+  .quest-header {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .quest-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--purple), var(--gold));
+  }
+  .quest-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; color: var(--accent); margin-bottom: 12px; font-family: 'Share Tech Mono'; }
+  .quest-title { font-family: 'Cinzel Decorative', serif; font-size: 1.4rem; color: white; margin-bottom: 8px; }
+  .quest-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+  .quest-meta { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+  .quest-stat { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+  .quest-stat .qs-label { color: var(--muted); }
+  .quest-stat .qs-val { font-weight: 700; font-family: 'Share Tech Mono'; }
+  .qs-val.gold { color: var(--gold); }
+  .qs-val.green { color: var(--green); }
+  .qs-val.accent { color: var(--accent); }
+
+  /* LESSON CONTENT */
+  .lesson-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .lesson-grid { grid-template-columns: 1fr; } .main { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+  .lesson-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .lesson-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
+  .lesson-card.done { border-color: rgba(0,255,136,0.4); }
+  .lesson-card.done::after { content: '✓'; position: absolute; top: 12px; right: 12px; color: var(--green); font-size: 1rem; font-weight: 700; }
+  .lc-icon { font-size: 2rem; margin-bottom: 10px; }
+  .lc-title { font-weight: 700; font-size: 1rem; color: white; margin-bottom: 6px; }
+  .lc-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+  .lc-xp { font-size: 0.8rem; color: var(--gold); font-family: 'Share Tech Mono'; }
+
+  /* MODAL / LESSON VIEW */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: min(900px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-top {
+    padding: 24px 28px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    position: sticky; top: 0; background: var(--panel); z-index: 5;
+  }
+  .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: white; }
+  .modal-body { padding: 24px 28px; }
+
+  /* CONTENT STYLES */
+  .content-section { margin-bottom: 28px; }
+  .content-section h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .content-section h3::before { content: '▸'; }
+  .content-section p { color: var(--text); line-height: 1.7; font-size: 0.95rem; margin-bottom: 10px; }
+
+  .concept-box {
+    background: var(--panel2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .concept-box.gold-box { border-left-color: var(--gold); }
+  .concept-box.green-box { border-left-color: var(--green); }
+  .concept-box.purple-box { border-left-color: var(--purple); }
+
+  .analogy-block {
+    background: rgba(168,85,247,0.08);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 8px; padding: 14px 16px; margin: 12px 0;
+  }
+  .analogy-block .a-label { font-size: 0.75rem; color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; font-family: 'Share Tech Mono'; }
+
+  .pillars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
+  .pillar { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+  .pillar .p-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .pillar .p-name { font-size: 0.85rem; font-weight: 700; color: white; }
+  .pillar .p-desc { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  /* QUIZ */
+  .quiz-section { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 24px; }
+  .quiz-label { font-size: 0.75rem; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; font-family: 'Share Tech Mono'; margin-bottom: 12px; }
+  .quiz-q { font-size: 1rem; font-weight: 600; color: white; margin-bottom: 16px; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    text-align: left;
+    color: var(--text);
+  }
+  .quiz-opt:hover { border-color: var(--accent); color: white; }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(0,255,136,0.08); color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(255,68,102,0.08); color: var(--red); }
+  .quiz-feedback { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 0.9rem; line-height: 1.5; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.3); color: var(--green); }
+  .quiz-feedback.wrong { background: rgba(255,68,102,0.08); border: 1px solid rgba(255,68,102,0.3); color: #ff8899; }
+
+  /* INTERVIEW */
+  .interview-card {
+    background: var(--panel2);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .interview-card .ic-tag { font-size: 0.7rem; font-family: 'Share Tech Mono'; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .interview-card .ic-q { font-weight: 600; color: white; margin-bottom: 10px; line-height: 1.5; }
+  .interview-card .ic-hint { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  .ic-reveal { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 0.8rem; color: var(--muted); cursor: pointer; font-family: 'Rajdhani', sans-serif; transition: all 0.2s; margin-top: 8px; }
+  .ic-reveal:hover { border-color: var(--gold); color: var(--gold); }
+  .ic-answer { display: none; margin-top: 10px; padding: 10px; background: rgba(255,215,0,0.06); border-radius: 6px; font-size: 0.85rem; color: var(--text); line-height: 1.6; }
+  .ic-answer.show { display: block; }
+
+  /* ROADMAP */
+  .roadmap { position: relative; padding: 0 0 0 30px; }
+  .roadmap::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent), var(--purple), var(--gold)); }
+  .rm-item { position: relative; margin-bottom: 20px; }
+  .rm-dot { position: absolute; left: -26px; top: 4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); }
+  .rm-dot.done { background: var(--green); border-color: var(--green); }
+  .rm-dot.active { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .rm-dot.locked { border-color: var(--muted); }
+  .rm-phase { font-size: 0.7rem; color: var(--muted); font-family: 'Share Tech Mono'; text-transform: uppercase; letter-spacing: 0.1em; }
+  .rm-name { font-weight: 700; color: white; margin: 2px 0; }
+  .rm-desc { font-size: 0.85rem; color: var(--muted); }
+  .rm-duration { font-size: 0.75rem; color: var(--accent); font-family: 'Share Tech Mono'; margin-top: 4px; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; font-weight: 700;
+    letter-spacing: 0.05em; transition: all 0.2s;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #0090bb); color: #000; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,212,255,0.4); }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), #cc9900); color: #000; }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,215,0,0.4); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* XP POPUP */
+  .xp-popup { position: fixed; top: 80px; right: 24px; background: rgba(0,212,255,0.15); border: 1px solid var(--accent); border-radius: 10px; padding: 12px 20px; z-index: 200; transform: translateX(200px); opacity: 0; transition: all 0.4s; }
+  .xp-popup.show { transform: translateX(0); opacity: 1; }
+  .xp-popup .xp-amt { font-family: 'Cinzel Decorative', serif; font-size: 1.5rem; color: var(--gold); }
+  .xp-popup .xp-msg { font-size: 0.85rem; color: var(--accent); }
+
+  /* ACHIEVEMENT */
+  .achievement-banner { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #1a0a30, #0a1a30); border: 1px solid var(--purple); border-radius: 12px; padding: 16px 24px; z-index: 200; text-align: center; transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1); min-width: 280px; }
+  .achievement-banner.show { display: block; transform: translateX(-50%) translateY(0); }
+  .ach-icon { font-size: 2rem; }
+  .ach-title { font-family: 'Cinzel Decorative', serif; font-size: 0.9rem; color: var(--gold); }
+  .ach-desc { font-size: 0.85rem; color: var(--muted); }
+
+  /* PROGRESS BAR (module) */
+  .module-progress { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mp-seg { flex: 1; height: 4px; background: var(--panel2); border-radius: 2px; min-width: 24px; }
+  .mp-seg.done { background: var(--green); }
+  .mp-seg.active { background: var(--accent); }
+
+  /* DAILY STREAK */
+  .streak-box { display: flex; align-items: center; gap: 8px; }
+  .streak-flame { font-size: 1.4rem; animation: flicker 2s ease-in-out infinite; }
+  @keyframes flicker { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.85;transform:scale(1.08)} }
+  .streak-count { font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; color: var(--gold); }
+  .streak-label { font-size: 0.75rem; color: var(--muted); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  code { font-family: 'Share Tech Mono'; background: var(--panel2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: var(--accent); }
+
+  .tag { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; color: var(--accent); font-family: 'Share Tech Mono'; margin: 2px; }
+  .tag.tag-gold { background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.2); color: var(--gold); }
+  .tag.tag-green { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.2); color: var(--green); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    ArchitectQuest
+    <span>Junior → Senior Solutions Architect</span>
+  </div>
+  <div class="player-bar">
+    <div class="avatar">🏗️</div>
+    <div class="player-info">
+      <div class="player-name">Architect</div>
+      <div class="player-rank" id="rank-display">Rank I — Junior Apprentice</div>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-label" id="xp-display">0 / 500 XP</div>
+      <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-flame">🔥</div>
+      <div>
+        <div class="streak-count" id="streak-count">1</div>
+        <div class="streak-label">Day Streak</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Skill Tree</div>
+      <div class="skill-node active" onclick="openLesson('fundamentals')">
+        <div class="skill-icon c-arch">🏛️</div>
+        <div class="skill-text">
+          <div class="sname">Architecture Fundamentals</div>
+          <div class="sprog">In Progress</div>
+        </div>
+        <div class="skill-check" id="sk-fund">⚡</div>
+      </div>
+      <div class="skill-node locked" id="sidebar-cloud">
+        <div class="skill-icon c-cloud">☁️</div>
+        <div class="skill-text">
+          <div class="sname">Cloud Foundations</div>
+          <div class="sprog">Complete Phase 1 to unlock</div>
+        </div>
+        <div class="skill-check" id="sk-cloud">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-net">🌐</div>
+        <div class="skill-text">
+          <div class="sname">Networking & APIs</div>
+          <div class="sprog">Locked — Level 3+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-sec">🛡️</div>
+        <div class="skill-text">
+          <div class="sname">Security & Compliance</div>
+          <div class="sprog">Locked — Level 5+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-data">🗄️</div>
+        <div class="skill-text">
+          <div class="sname">Data & Databases</div>
+          <div class="sprog">Locked — Level 7+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-arch">⚙️</div>
+        <div class="skill-text">
+          <div class="sname">Microservices & Patterns</div>
+          <div class="sprog">Locked — Level 10+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-cloud">📊</div>
+        <div class="skill-text">
+          <div class="sname">Cost & Optimization</div>
+          <div class="sprog">Locked — Level 12+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+      <div class="skill-node locked">
+        <div class="skill-icon c-arch">👑</div>
+        <div class="skill-text">
+          <div class="sname">Senior Mastery</div>
+          <div class="sprog">Locked — Level 20+</div>
+        </div>
+        <div class="skill-check">🔒</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Today's Quests</div>
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7">
+        <div style="margin-bottom:6px">📖 <span style="color:var(--text)">Read: Well-Architected Framework</span></div>
+        <div style="margin-bottom:6px">🧠 <span style="color:var(--text)">Quiz: CAP Theorem basics</span></div>
+        <div style="margin-bottom:6px">🎯 <span style="color:var(--text)">Interview Prep: 2 questions</span></div>
+        <div style="color:var(--muted)">⏱️ 15–20 min total</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Achievements</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <div style="font-size:1.4rem" title="First Login">🌟</div>
+        <div style="font-size:1.4rem;opacity:0.3" title="Locked">🏆</div>
+        <div style="font-size:1.4rem;opacity:0.3" title="Locked">💎</div>
+        <div style="font-size:1.4rem;opacity:0.3" title="Locked">⚔️</div>
+        <div style="font-size:1.4rem;opacity:0.3" title="Locked">🚀</div>
+        <div style="font-size:1.4rem;opacity:0.3" title="Locked">👑</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content" id="main-content">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('journey',this)">🗺️ My Journey</div>
+      <div class="tab" onclick="switchTab('lessons',this)">📚 Lessons</div>
+      <div class="tab" id="tab-phase2-btn" onclick="switchTab('phase2',this)" style="display:none">☁️ Phase 2</div>
+      <div class="tab" onclick="switchTab('interview',this)">🎯 Interview Prep</div>
+      <div class="tab" onclick="switchTab('roadmap',this)">🛣️ Full Roadmap</div>
+    </div>
+
+    <!-- JOURNEY TAB -->
+    <div id="tab-journey">
+      <div class="quest-header">
+        <div class="quest-badge">⚡ Active Quest</div>
+        <div class="quest-title">The Foundation Stone</div>
+        <div class="quest-sub">Every great architect begins by understanding the core principles that govern all system design decisions. Master these and everything else clicks into place.</div>
+        <div class="quest-meta">
+          <div class="quest-stat"><span class="qs-label">Reward:</span><span class="qs-val gold">+250 XP</span></div>
+          <div class="quest-stat"><span class="qs-label">Lessons:</span><span class="qs-val accent">4 Topics</span></div>
+          <div class="quest-stat"><span class="qs-label">Est. Time:</span><span class="qs-val green">~45 min</span></div>
+          <div class="quest-stat"><span class="qs-label">Difficulty:</span><span class="qs-val" style="color:var(--green)">★★☆☆☆</span></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;font-size:0.8rem;color:var(--muted);">MODULE PROGRESS</div>
+      <div class="module-progress" id="module-progress">
+        <div class="mp-seg active"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+        <div class="mp-seg"></div>
+      </div>
+
+      <div class="lesson-grid">
+        <div class="lesson-card" id="lc-1" onclick="openLesson('fundamentals')">
+          <div class="lc-icon">🏛️</div>
+          <div class="lc-title">What is Solution Architecture?</div>
+          <div class="lc-desc">Understand the role, responsibilities, and mindset of a Solutions Architect. Learn how you bridge business needs and technical solutions.</div>
+          <div class="lc-xp">⚡ +75 XP · 10 min</div>
+        </div>
+        <div class="lesson-card" id="lc-2" onclick="openLesson('pillars')">
+          <div class="lc-icon">⚖️</div>
+          <div class="lc-title">The Well-Architected Framework</div>
+          <div class="lc-desc">AWS's 6 pillars that define great architecture. These appear in virtually every senior interview — master them cold.</div>
+          <div class="lc-xp">⚡ +80 XP · 12 min</div>
+        </div>
+        <div class="lesson-card" id="lc-3" onclick="openLesson('tradeoffs')">
+          <div class="lc-icon">🎭</div>
+          <div class="lc-title">The Art of Trade-offs</div>
+          <div class="lc-desc">CAP Theorem, PACELC, consistency vs availability. The core skill that separates junior from senior thinking.</div>
+          <div class="lc-xp">⚡ +90 XP · 15 min</div>
+        </div>
+        <div class="lesson-card" id="lc-4" onclick="openLesson('diagrams')">
+          <div class="lc-icon">📐</div>
+          <div class="lc-title">Architecture Diagrams & Communication</div>
+          <div class="lc-desc">Learn C4 Model, UML basics, and how to communicate your designs to both engineers and business stakeholders.</div>
+          <div class="lc-xp">⚡ +75 XP · 10 min</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="openLesson('fundamentals')">▶ Begin Current Lesson</button>
+        <button class="btn btn-ghost" onclick="switchTab('roadmap',document.querySelectorAll('.tab')[3])">View Full Roadmap</button>
+      </div>
+    </div>
+
+    <!-- LESSONS TAB -->
+    <div id="tab-lessons" style="display:none">
+      <div style="margin-bottom:20px">
+        <div style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-bottom:6px">Lesson Library</div>
+        <div style="color:var(--muted);font-size:0.9rem">Complete lessons to unlock new skills and earn XP. Each lesson includes a quiz and interview questions.</div>
+      </div>
+      <div class="lesson-grid">
+        <div class="lesson-card" onclick="openLesson('fundamentals')"><div class="lc-icon">🏛️</div><div class="lc-title">What is Solution Architecture?</div><div class="lc-desc">Role, responsibilities, stakeholder management.</div><div class="lc-xp">⚡ +75 XP</div></div>
+        <div class="lesson-card" onclick="openLesson('pillars')"><div class="lc-icon">⚖️</div><div class="lc-title">Well-Architected Framework</div><div class="lc-desc">6 pillars — Operational Excellence to Sustainability.</div><div class="lc-xp">⚡ +80 XP</div></div>
+        <div class="lesson-card" onclick="openLesson('tradeoffs')"><div class="lc-icon">🎭</div><div class="lc-title">Trade-offs & CAP Theorem</div><div class="lc-desc">Consistency, availability, partition tolerance.</div><div class="lc-xp">⚡ +90 XP</div></div>
+        <div class="lesson-card" onclick="openLesson('diagrams')"><div class="lc-icon">📐</div><div class="lc-title">Architecture Diagrams</div><div class="lc-desc">C4 Model, diagramming tools, communication.</div><div class="lc-xp">⚡ +75 XP</div></div>
+        <div class="lesson-card locked" style="opacity:0.5;cursor:not-allowed"><div class="lc-icon">☁️</div><div class="lc-title">Cloud Service Models</div><div class="lc-desc">IaaS, PaaS, SaaS, FaaS — when to use what.</div><div class="lc-xp">🔒 Unlock at Level 2</div></div>
+        <div class="lesson-card locked" style="opacity:0.5;cursor:not-allowed"><div class="lc-icon">📡</div><div class="lc-title">Network Architecture</div><div class="lc-desc">VPCs, subnets, load balancers, CDNs.</div><div class="lc-xp">🔒 Unlock at Level 3</div></div>
+      </div>
+    </div>
+
+    <!-- INTERVIEW TAB -->
+    <div id="tab-interview" style="display:none">
+      <div style="margin-bottom:20px">
+        <div style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-bottom:6px">🎯 Interview Battle Prep</div>
+        <div style="color:var(--muted);font-size:0.9rem">Real questions from SA interviews at FAANG, Big 4, and top tech companies. Click to reveal model answers.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <span class="tag">Junior Level</span>
+        <span class="tag tag-gold">Mid Level (locked)</span>
+        <span class="tag tag-green" style="opacity:0.4">Senior (locked)</span>
+      </div>
+
+      <div class="interview-card">
+        <div class="ic-tag">🎯 Q1 · Architecture Fundamentals</div>
+        <div class="ic-q">"Walk me through how you'd design a system architecture for a new web application that needs to support 10,000 concurrent users."</div>
+        <div class="ic-hint">💡 Tip: Structure your answer around: Presentation → Application → Data layers. Mention scalability from the start.</div>
+        <button class="ic-reveal" onclick="revealAnswer(this)">Reveal Model Answer</button>
+        <div class="ic-answer">Start with a load balancer distributing traffic across multiple web servers (horizontal scaling). Use auto-scaling groups so the system expands under load and contracts to save cost. Separate the application layer from the database. Use a managed relational DB (RDS/Cloud SQL) for transactional data, with read replicas to distribute read load. Add a caching layer (Redis/Memcached) to reduce DB hits for hot data. Use a CDN to serve static assets. Finally — add monitoring (CloudWatch/Datadog) and ensure you have circuit breakers to prevent cascade failures. The key is to make each layer independently scalable.</div>
+      </div>
+
+      <div class="interview-card">
+        <div class="ic-tag">🎯 Q2 · Trade-offs</div>
+        <div class="ic-q">"Explain the CAP theorem and describe a scenario where you had to choose between consistency and availability."</div>
+        <div class="ic-hint">💡 Tip: Don't just define it — give a concrete example. E-commerce checkout vs product catalog behave differently.</div>
+        <button class="ic-reveal" onclick="revealAnswer(this)">Reveal Model Answer</button>
+        <div class="ic-answer">CAP Theorem states that in a distributed system, you can only guarantee two of three: Consistency (all nodes see the same data), Availability (system always responds), or Partition Tolerance (system works despite network splits). Since network partitions happen in real distributed systems, you're really choosing between CP and AP. Example: For a payment service, I'd choose CP — it's better to refuse a transaction than to process a double charge. For a product catalog or social feed, I'd choose AP — stale data for a few seconds is acceptable; an outage is not. The key interview answer is showing you understand the business context drives the choice.</div>
+      </div>
+
+      <div class="interview-card">
+        <div class="ic-tag">🎯 Q3 · Well-Architected</div>
+        <div class="ic-q">"How would you evaluate whether an existing architecture is 'good'? What framework or criteria do you use?"</div>
+        <div class="ic-hint">💡 Tip: Reference the Well-Architected Framework pillars. Show structured thinking, not gut feel.</div>
+        <button class="ic-reveal" onclick="revealAnswer(this)">Reveal Model Answer</button>
+        <div class="ic-answer">I use the AWS Well-Architected Framework as a structured lens: Operational Excellence (can we deploy and monitor reliably?), Security (are we protecting data and following least-privilege?), Reliability (does it recover from failure automatically?), Performance Efficiency (are we using resources appropriately for the load?), Cost Optimization (are we paying for what we actually need?), and Sustainability (are we minimizing environmental impact?). I'd run a Well-Architected Review with the team — interviewing stakeholders, reviewing architecture diagrams, checking IaC configs — and produce a findings report with prioritized remediation items. Interviewers love this answer because it shows process, not just instinct.</div>
+      </div>
+
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.9rem">
+        🔒 15 more questions unlock as you level up · Topics: Microservices, Security, Cost, System Design
+      </div>
+    </div>
+
+    <!-- ROADMAP TAB -->
+    <div id="tab-roadmap" style="display:none">
+      <div style="margin-bottom:20px">
+        <div style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-bottom:6px">🛣️ Your Full Journey</div>
+        <div style="color:var(--muted);font-size:0.9rem">A structured 4-month path from Junior to Senior Solutions Architect. Each phase builds on the last.</div>
+      </div>
+
+      <div class="roadmap">
+        <div class="rm-item">
+          <div class="rm-dot active"></div>
+          <div class="rm-phase">PHASE 1 · Weeks 1–3</div>
+          <div class="rm-name">Architecture Fundamentals</div>
+          <div class="rm-desc">Role of an SA, Well-Architected Framework, trade-off thinking, diagramming, C4 model, stakeholder communication</div>
+          <div class="rm-duration">⚡ 500 XP · Currently Active</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 2 · Weeks 4–6</div>
+          <div class="rm-name">Cloud Foundations</div>
+          <div class="rm-desc">IaaS/PaaS/SaaS, compute (EC2, Lambda, containers), storage types, networking (VPC, subnets, routing), IAM basics</div>
+          <div class="rm-duration">⚡ 700 XP · Unlock at Level 3</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 3 · Weeks 7–9</div>
+          <div class="rm-name">Networking & APIs</div>
+          <div class="rm-desc">REST vs GraphQL vs gRPC, API Gateway patterns, CDN, DNS, load balancing strategies, WebSockets, OAuth flows</div>
+          <div class="rm-duration">⚡ 900 XP · Unlock at Level 6</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 4 · Weeks 10–12</div>
+          <div class="rm-name">Security Architecture</div>
+          <div class="rm-desc">Zero Trust, encryption at rest/in transit, WAF, DDoS, secrets management, compliance frameworks (SOC2, GDPR, HIPAA)</div>
+          <div class="rm-duration">⚡ 1000 XP · Unlock at Level 10</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 5 · Weeks 13–14</div>
+          <div class="rm-name">Data & Databases</div>
+          <div class="rm-desc">SQL vs NoSQL, OLAP vs OLTP, sharding, replication, data lakes, streaming (Kafka, Kinesis), event-driven architecture</div>
+          <div class="rm-duration">⚡ 1100 XP · Unlock at Level 14</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 6 · Weeks 15–16</div>
+          <div class="rm-name">Microservices & Design Patterns</div>
+          <div class="rm-desc">SAGA, CQRS, Event Sourcing, Strangler Fig, Circuit Breaker, Service Mesh, Domain-Driven Design basics</div>
+          <div class="rm-duration">⚡ 1200 XP · Unlock at Level 17</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 7 · Weeks 17–18</div>
+          <div class="rm-name">Observability & Reliability</div>
+          <div class="rm-desc">SLAs, SLOs, SLIs, monitoring vs observability, distributed tracing, chaos engineering, disaster recovery (RTO/RPO)</div>
+          <div class="rm-duration">⚡ 1100 XP · Unlock at Level 19</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">PHASE 8 · Weeks 19–20</div>
+          <div class="rm-name">Cost Optimization & FinOps</div>
+          <div class="rm-desc">Reserved vs Spot instances, rightsizing, tagging strategy, multi-cloud cost, TCO analysis, build vs buy decisions</div>
+          <div class="rm-duration">⚡ 900 XP · Unlock at Level 21</div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-dot locked"></div>
+          <div class="rm-phase">FINAL BOSS · Week 21+</div>
+          <div class="rm-name">👑 Senior Architect Mastery</div>
+          <div class="rm-desc">System design capstone challenges, mock interview battles, architecture review simulations, presenting to "the board"</div>
+          <div class="rm-duration">⚡ 2000 XP · Unlock at Level 23 · Earn: Senior Architect Badge</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 TAB (unlocked after Phase 1 complete) -->
+    <div id="tab-phase2" style="display:none">
+      <div class="quest-header">
+        <div class="quest-badge">☁️ Phase 2 — Unlocked!</div>
+        <div class="quest-title">Cloud Foundations</div>
+        <div class="quest-sub">You've mastered how to think like an architect. Now learn the cloud building blocks every SA uses daily — compute, storage, networking, and identity.</div>
+        <div class="quest-meta">
+          <div class="quest-stat"><span class="qs-label">Reward:</span><span class="qs-val gold">+700 XP</span></div>
+          <div class="quest-stat"><span class="qs-label">Lessons:</span><span class="qs-val accent">4 Topics</span></div>
+          <div class="quest-stat"><span class="qs-label">Est. Time:</span><span class="qs-val green">~60 min</span></div>
+          <div class="quest-stat"><span class="qs-label">Difficulty:</span><span class="qs-val" style="color:var(--gold)">★★★☆☆</span></div>
+        </div>
+      </div>
+
+      <div class="lesson-grid">
+        <div class="lesson-card" id="lc-p2-1" onclick="openLesson('servicemodels')">
+          <div class="lc-icon">📦</div>
+          <div class="lc-title">IaaS, PaaS, SaaS & FaaS</div>
+          <div class="lc-desc">Know exactly when to use each service model. This comes up in every SA interview and every vendor conversation.</div>
+          <div class="lc-xp">⚡ +100 XP · 12 min</div>
+        </div>
+        <div class="lesson-card" id="lc-p2-2" onclick="openLesson('compute')">
+          <div class="lc-icon">⚙️</div>
+          <div class="lc-title">Compute: VMs, Containers & Serverless</div>
+          <div class="lc-desc">EC2 vs ECS vs Lambda. When to containerise, when to go serverless, and when bare metal still wins.</div>
+          <div class="lc-xp">⚡ +110 XP · 15 min</div>
+        </div>
+        <div class="lesson-card" id="lc-p2-3" onclick="openLesson('storage')">
+          <div class="lc-icon">🗄️</div>
+          <div class="lc-title">Storage: Object, Block & File</div>
+          <div class="lc-desc">S3 vs EBS vs EFS. Choosing the right storage is one of the highest-impact architectural decisions you'll make.</div>
+          <div class="lc-xp">⚡ +100 XP · 12 min</div>
+        </div>
+        <div class="lesson-card" id="lc-p2-4" onclick="openLesson('iam')">
+          <div class="lc-icon">🔑</div>
+          <div class="lc-title">Identity & Access Management (IAM)</div>
+          <div class="lc-desc">Least privilege, roles vs users, service accounts, federation. Security starts here — and interviewers know it.</div>
+          <div class="lc-xp">⚡ +110 XP · 15 min</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LESSON MODALS -->
+<div class="modal-overlay" id="modal-servicemodels">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">📦 Phase 2 · Cloud Foundations</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">IaaS, PaaS, SaaS & FaaS</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The four cloud service models — and when each one is the right call.</div>
+      <button class="modal-close" onclick="closeModal('servicemodels')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>Why This Matters</h3>
+        <p>Choosing the wrong service model is one of the most expensive mistakes in cloud architecture. Picking IaaS when you need PaaS means months of unnecessary infrastructure management. Picking SaaS when you need control means painful vendor lock-in later.</p>
+      </div>
+      <div class="content-section">
+        <h3>The Four Models</h3>
+        <div class="concept-box">
+          <strong>🖥️ IaaS — Infrastructure as a Service</strong><br>
+          You get raw compute, storage, and networking. You manage the OS, runtime, middleware, and app. Maximum control, maximum responsibility. Use when you need fine-grained control, custom OS configs, or are lifting-and-shifting legacy workloads.<br>
+          <em style="color:var(--muted)">Examples: AWS EC2, Azure VMs, GCP Compute Engine</em>
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>🏗️ PaaS — Platform as a Service</strong><br>
+          The cloud manages OS, runtime, and middleware. You only manage your app and data. Faster to deploy, less ops overhead. Use for web apps, APIs, and microservices where you don't need OS-level control.<br>
+          <em style="color:var(--muted)">Examples: AWS Elastic Beanstalk, Heroku, Google App Engine, Azure App Service</em>
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>☁️ SaaS — Software as a Service</strong><br>
+          The entire stack is managed. You just configure and use it. Zero infrastructure concern. Use for commodity tools (email, CRM, HR) where differentiation isn't needed.<br>
+          <em style="color:var(--muted)">Examples: Salesforce, Google Workspace, Slack, Datadog</em>
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>⚡ FaaS — Function as a Service (Serverless)</strong><br>
+          You deploy individual functions triggered by events. No servers to manage, pay only per invocation. Use for event-driven workloads, async processing, and bursty irregular traffic.<br>
+          <em style="color:var(--muted)">Examples: AWS Lambda, Azure Functions, Google Cloud Functions</em>
+        </div>
+      </div>
+      <div class="content-section">
+        <h3>The Shared Responsibility Model</h3>
+        <p>A key concept for security interviews: as you move from IaaS → PaaS → SaaS, the cloud provider takes on more responsibility. With IaaS you own OS patching; with SaaS the vendor handles everything. You're always responsible for your data and access control.</p>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Answer Frame:</strong> "I start by asking — does our team have the operational maturity to manage this layer? If not, abstract it away. Every layer you manage yourself is engineering time not spent on business value."
+        </div>
+      </div>
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
+        <div class="quiz-q">A startup wants to launch a CRUD web API in 2 weeks. They have 2 backend devs and no DevOps engineer. What's the best service model?</div>
+        <div class="quiz-options" id="quiz-servicemodels">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-servicemodels', this, false, 'servicemodels')">IaaS — gives them full control over the infrastructure</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-servicemodels', this, true, 'servicemodels')">PaaS — they focus on code, not servers; faster to market with no ops overhead</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-servicemodels', this, false, 'servicemodels')">SaaS — let another company handle everything</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-servicemodels', this, false, 'servicemodels')">FaaS — serverless is always the cheapest option</button>
+        </div>
+        <div class="quiz-feedback" id="qf-servicemodels"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('servicemodels', 100, 'lc-p2-1'); closeModal('servicemodels')">✓ Complete Lesson (+100 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('servicemodels')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-compute">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">⚙️ Phase 2 · Cloud Foundations</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Compute: VMs, Containers & Serverless</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The three compute paradigms — and how to pick the right one.</div>
+      <button class="modal-close" onclick="closeModal('compute')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>The Three Compute Paradigms</h3>
+        <div class="concept-box">
+          <strong>🖥️ Virtual Machines (EC2, Azure VMs)</strong><br>
+          Full OS, persistent, long-running. Boot time: minutes. Best for: stateful apps, legacy lifts, workloads needing GPU/custom OS. Downside: you pay whether idle or busy, and you manage patching.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>🐳 Containers (ECS, EKS, GKE)</strong><br>
+          Lightweight, portable, share the host OS kernel. Boot time: seconds. Best for: microservices, consistent dev-to-prod environments, scaling individual services independently. Kubernetes is the de-facto orchestrator — know it exists even if you don't operate it yourself.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>⚡ Serverless (Lambda, Cloud Functions)</strong><br>
+          Event-triggered, stateless, ephemeral. Boot time: milliseconds (with warm containers) to seconds (cold start). Best for: async jobs, event processing, APIs with irregular traffic. Downside: cold starts, 15-min max execution, harder to debug locally.
+        </div>
+      </div>
+      <div class="content-section">
+        <h3>Decision Framework</h3>
+        <div class="analogy-block">
+          <div class="a-label">🧭 How to Choose</div>
+          Ask: Is workload <strong>event-driven and short-lived</strong>? → Serverless. Is it a <strong>microservice that needs to scale independently</strong>? → Container. Does it need a <strong>specific OS, GPU, or run continuously</strong>? → VM.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Senior SA Move:</strong> Mention that most modern architectures mix all three. Serverless for async triggers, containers for core APIs, VMs for databases or GPU workloads. Avoid the trap of picking one and applying it everywhere.
+        </div>
+      </div>
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
+        <div class="quiz-q">A system needs to resize images whenever a user uploads a photo. Traffic is unpredictable — sometimes zero, sometimes thousands of uploads per minute. Best compute choice?</div>
+        <div class="quiz-options" id="quiz-compute">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-compute', this, false, 'compute')">A fleet of EC2 instances running 24/7 to handle peak load</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-compute', this, false, 'compute')">A Kubernetes cluster with always-on pods</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-compute', this, true, 'compute')">AWS Lambda triggered by S3 upload events — scales to zero and handles bursts automatically</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-compute', this, false, 'compute')">A VM with a cron job that checks for new uploads every minute</button>
+        </div>
+        <div class="quiz-feedback" id="qf-compute"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('compute', 110, 'lc-p2-2'); closeModal('compute')">✓ Complete Lesson (+110 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('compute')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-storage">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">🗄️ Phase 2 · Cloud Foundations</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Storage: Object, Block & File</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Three storage types, three completely different use cases.</div>
+      <button class="modal-close" onclick="closeModal('storage')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>The Three Storage Types</h3>
+        <div class="concept-box">
+          <strong>🪣 Object Storage (S3, GCS, Blob)</strong><br>
+          Stores files as objects with metadata. Flat namespace. Accessed via HTTP/API. Infinitely scalable, cheap, durable (99.999999999% — "11 nines"). Use for: images, videos, backups, static websites, data lake raw files, ML training datasets.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>💾 Block Storage (EBS, Azure Disk)</strong><br>
+          Raw storage volumes attached to a single VM. Low latency, high IOPS. Works like a hard drive. Use for: OS volumes, databases (PostgreSQL, MySQL), any app needing a mounted filesystem on one server.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>📁 File Storage (EFS, Azure Files, FSx)</strong><br>
+          Shared filesystem mounted by multiple instances simultaneously. NFS-style. Use for: shared content repos, CMS media, HPC shared scratch space, lift-and-shift of apps expecting a shared drive.
+        </div>
+      </div>
+      <div class="content-section">
+        <h3>Quick Decision Rule</h3>
+        <p><strong>Multiple instances need to read/write simultaneously?</strong> → File storage. <strong>One instance needs a fast disk?</strong> → Block. <strong>Storing files/objects accessed via API or URL?</strong> → Object.</p>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Pattern:</strong> "For our data lake we used S3 as the raw layer — cheap, durable, queryable via Athena. For our application databases we used EBS gp3 volumes — low latency, predictable IOPS. For our shared rendering cluster we needed EFS so all nodes could access the same asset files."
+        </div>
+      </div>
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
+        <div class="quiz-q">A video streaming platform needs to store millions of user-uploaded videos, serve them globally via CDN, and run ML jobs against them. Which storage type?</div>
+        <div class="quiz-options" id="quiz-storage">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-storage', this, true, 'storage')">Object storage (S3) — scalable, cheap, HTTP-accessible, integrates with CDN and ML services</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-storage', this, false, 'storage')">Block storage — fast random access for video seeking</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-storage', this, false, 'storage')">File storage — so all servers can access videos simultaneously</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-storage', this, false, 'storage')">A relational database with BLOB columns</button>
+        </div>
+        <div class="quiz-feedback" id="qf-storage"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('storage', 100, 'lc-p2-3'); closeModal('storage')">✓ Complete Lesson (+100 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('storage')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-iam">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">🔑 Phase 2 · Cloud Foundations</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Identity & Access Management (IAM)</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The foundation of cloud security. Get this wrong and nothing else matters.</div>
+      <button class="modal-close" onclick="closeModal('iam')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>The Golden Rule: Least Privilege</h3>
+        <p>Every identity (human or machine) should have the <strong>minimum permissions needed to do its job — nothing more</strong>. This is the single most important IAM principle. Violating it is the root cause of the majority of cloud breaches.</p>
+        <div class="analogy-block">
+          <div class="a-label">🏢 Analogy</div>
+          A hotel cleaner has a key card that opens guest rooms — but not the safe, the server room, or the CEO's office. IAM is your key card system. Every service, user, and role gets exactly the doors they need.
+        </div>
+      </div>
+      <div class="content-section">
+        <h3>Core IAM Concepts</h3>
+        <div class="concept-box">
+          <strong>Users vs Roles vs Groups</strong><br>
+          <em>Users</em> = individual humans with long-term credentials (avoid for services). <em>Roles</em> = temporary credentials assumed by services, lambdas, or cross-account access (prefer this). <em>Groups</em> = attach policies to multiple users at once.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>Policies</strong><br>
+          JSON documents that define Allow/Deny for specific Actions on specific Resources. Explicit Deny always wins over Allow. Use managed policies for common patterns, inline policies for specific exceptions.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Service Accounts & Federation</strong><br>
+          Never hardcode AWS keys in code. Use IAM Roles for EC2/Lambda (instance profiles). For human users, federate with your Identity Provider (Okta, Azure AD) via SAML or OIDC — single sign-on, central revocation.
+        </div>
+      </div>
+      <div class="content-section">
+        <h3>IAM Best Practices (Interview Checklist)</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
+          <span class="tag">Enable MFA on root</span><span class="tag">Never use root account daily</span><span class="tag">Rotate access keys</span><span class="tag">Use roles not users for services</span><span class="tag">Audit with CloudTrail</span><span class="tag">Use permission boundaries</span><span class="tag">SCPs for org-wide guardrails</span>
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Senior SA Answer:</strong> "I'd enforce least privilege via IAM roles with permission boundaries, federate human access through our IdP, enable CloudTrail for all API calls, and use AWS Config rules to continuously audit for overly permissive policies — flagging any * wildcard actions automatically."
+        </div>
+      </div>
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
+        <div class="quiz-q">A Lambda function needs to read from an S3 bucket. What's the correct way to grant it access?</div>
+        <div class="quiz-options" id="quiz-iam">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-iam', this, false, 'iam')">Create an IAM user, generate access keys, and set them as Lambda environment variables</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-iam', this, false, 'iam')">Make the S3 bucket public so Lambda can always access it</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-iam', this, true, 'iam')">Create an IAM Role with an S3 read policy and assign it as the Lambda execution role</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-iam', this, false, 'iam')">Store access keys in AWS Secrets Manager and have Lambda fetch them at runtime</button>
+        </div>
+        <div class="quiz-feedback" id="qf-iam"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('iam', 110, 'lc-p2-4'); closeModal('iam')">✓ Complete Lesson (+110 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('iam')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-fundamentals">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">🏛️ Lesson 1 · Architecture Fundamentals</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">What is a Solutions Architect?</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The mindset, responsibilities, and superpowers of your role.</div>
+      <button class="modal-close" onclick="closeModal('fundamentals')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>The Role in One Sentence</h3>
+        <p>A Solutions Architect is the translator between <strong>what the business needs</strong> and <strong>what technology can deliver</strong> — making complex technical decisions that have real commercial consequences.</p>
+        <div class="analogy-block">
+          <div class="a-label">🏗️ Real World Analogy</div>
+          Think of yourself as an architect designing a skyscraper. You don't lay every brick yourself — but you make the critical decisions: structural load, materials, safety systems, and aesthetics. The builders (engineers) execute your plan. If your plan is wrong, the building falls. If it's brilliant, it stands for 50 years.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Your Core Responsibilities</h3>
+        <div class="pillars-grid">
+          <div class="pillar"><div class="p-icon">🎯</div><div class="p-name">Design</div><div class="p-desc">Create technical blueprints that solve business problems</div></div>
+          <div class="pillar"><div class="p-icon">🗣️</div><div class="p-name">Communicate</div><div class="p-desc">Translate tech to execs and business to engineers</div></div>
+          <div class="pillar"><div class="p-icon">⚖️</div><div class="p-name">Trade-offs</div><div class="p-desc">Balance cost, speed, reliability and security</div></div>
+          <div class="pillar"><div class="p-icon">🔮</div><div class="p-name">Anticipate</div><div class="p-desc">Design for tomorrow's scale, not just today's</div></div>
+          <div class="pillar"><div class="p-icon">🛡️</div><div class="p-name">Risk</div><div class="p-desc">Identify and mitigate technical and business risks</div></div>
+          <div class="pillar"><div class="p-icon">🤝</div><div class="p-name">Align</div><div class="p-desc">Ensure technical roadmap matches business strategy</div></div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Junior vs Senior Mindset</h3>
+        <div class="concept-box">
+          <strong>Junior SA thinks:</strong> "What's the best technology for this?"<br>
+          <strong>Senior SA thinks:</strong> "What's the best outcome for the business — and which technology gets us there with acceptable risk and cost?"
+        </div>
+        <p>The shift is from <em>technology-first</em> to <em>outcome-first</em> thinking. This is the single most important mindset upgrade in your journey.</p>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Gold:</strong> When asked a design question, <em>always start</em> by asking about business requirements, scale expectations, budget constraints, and acceptable downtime. Interviewers reward this instinct.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The SA's Non-Functional Requirements (NFRs)</h3>
+        <p>These are the invisible requirements that define your architecture quality. Memorise these — they appear in every design discussion:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
+          <span class="tag">Scalability</span><span class="tag">Availability</span><span class="tag">Reliability</span><span class="tag">Performance</span><span class="tag">Security</span><span class="tag">Maintainability</span><span class="tag">Observability</span><span class="tag">Cost-efficiency</span><span class="tag">Compliance</span><span class="tag">Portability</span>
+        </div>
+        <p>Senior architects don't wait to be asked about NFRs — they proactively raise them. Every design decision should be traceable back to one of these.</p>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 25 XP</div>
+        <div class="quiz-q">A stakeholder asks you to "just use the fastest database". What's your first move as a Solutions Architect?</div>
+        <div class="quiz-options" id="quiz-fund">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-fund', this, false, 'fund')">Immediately research the fastest database technologies available</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-fund', this, true, 'fund')">Ask clarifying questions: fast for reads or writes? What's the data model? What's the acceptable latency? What's the budget?</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-fund', this, false, 'fund')">Recommend Redis — it's always the fastest option</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-fund', this, false, 'fund')">Escalate to the team lead to make the decision</button>
+        </div>
+        <div class="quiz-feedback" id="qf-fund"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('fundamentals', 75, 'lc-1'); closeModal('fundamentals')">✓ Complete Lesson (+75 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('fundamentals')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-pillars">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">⚖️ Lesson 2 · Architecture Fundamentals</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">The Well-Architected Framework</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The 6 pillars that define great architecture. A senior interview staple.</div>
+      <button class="modal-close" onclick="closeModal('pillars')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>Why This Matters</h3>
+        <p>AWS's Well-Architected Framework is the closest thing to a universal standard for evaluating cloud architectures. Even if you work on Azure or GCP, the principles translate. Senior interviewers use these pillars to structure technical conversations.</p>
+        <div class="concept-box gold-box">
+          <strong>🎯 Pro Tip:</strong> In any system design interview, you can score major points by saying "Let me walk through this from a Well-Architected perspective..." — it signals structured, mature thinking.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The 6 Pillars</h3>
+        <div class="concept-box">
+          <strong>1. 🔧 Operational Excellence</strong><br>
+          Running and monitoring systems to deliver business value, then continually improving processes. Think: IaC, CI/CD, runbooks, post-mortems, and small frequent changes over big risky releases.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>2. 🛡️ Security</strong><br>
+          Protecting data, systems, and assets. Key principles: least privilege, defence in depth, encryption everywhere, automated security checks, and treating security as code — not an afterthought.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>3. 🔄 Reliability</strong><br>
+          The ability to recover from failures and meet business demand. Covers: circuit breakers, retries with exponential backoff, multi-AZ deployment, automated failover, and chaos engineering.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>4. ⚡ Performance Efficiency</strong><br>
+          Using resources efficiently as demand changes. Know when to scale horizontally vs vertically, when caching helps, and how to benchmark. "Right-size" is a senior architect phrase.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>5. 💰 Cost Optimization</strong><br>
+          Avoid unnecessary spend. Understand CapEx vs OpEx, Spot vs Reserved vs On-Demand, and always tag your resources for cost visibility. FinOps is a growing discipline.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>6. 🌱 Sustainability</strong><br>
+          The newest pillar. Minimize environmental impact — choose regions with renewable energy, right-size to reduce waste, optimize for energy efficiency. ESG-conscious companies ask about this.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>How to Apply This in Practice</h3>
+        <p>A Well-Architected Review (WAR) is a structured conversation you run with a team — typically using AWS's questionnaire tool — that produces a report of <strong>high-risk issues</strong> (HRIs) and <strong>medium-risk issues</strong> (MRIs). As a senior SA you'll run these for existing systems.</p>
+        <div class="analogy-block">
+          <div class="a-label">🧭 Mental Model</div>
+          Think of the 6 pillars as 6 lenses. Every architecture decision you make, look through each lens: "Does this choice make me more or less operationally excellent? More or less secure?" You won't always optimise all 6 simultaneously — that's where trade-offs come in.
+        </div>
+      </div>
+
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 30 XP</div>
+        <div class="quiz-q">Your team wants to skip integration tests to ship a feature faster. Which Well-Architected pillar is most at risk?</div>
+        <div class="quiz-options" id="quiz-pillars">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-pillars', this, false, 'pillars')">Cost Optimization — tests take developer time</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-pillars', this, false, 'pillars')">Performance Efficiency — tests slow down the build</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-pillars', this, true, 'pillars')">Operational Excellence — quality gates and runbooks ensure reliable deployments</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-pillars', this, false, 'pillars')">Sustainability — fewer test runs = less compute</button>
+        </div>
+        <div class="quiz-feedback" id="qf-pillars"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('pillars', 80, 'lc-2'); closeModal('pillars')">✓ Complete Lesson (+80 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('pillars')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-tradeoffs">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">🎭 Lesson 3 · Architecture Fundamentals</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">The Art of Trade-offs & CAP Theorem</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The concept that separates junior from senior thinking.</div>
+      <button class="modal-close" onclick="closeModal('tradeoffs')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>There Is No Perfect Architecture</h3>
+        <p>This is the most important sentence in architecture. Every design decision is a trade-off. The junior SA looks for the "right answer." The senior SA asks "right for whom, when, and at what cost?"</p>
+      </div>
+
+      <div class="content-section">
+        <h3>CAP Theorem — Explained Simply</h3>
+        <p>In any distributed data system, you can only guarantee TWO of these three properties simultaneously:</p>
+        <div class="pillars-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🔒</div><div class="p-name">Consistency</div><div class="p-desc">Every read gets the most recent write (or an error)</div></div>
+          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">⚡</div><div class="p-name">Availability</div><div class="p-desc">Every request gets a response (maybe not the latest data)</div></div>
+          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">🌐</div><div class="p-name">Partition Tolerance</div><div class="p-desc">System continues despite network partitions</div></div>
+        </div>
+        <div class="concept-box">
+          <strong>The key insight:</strong> Network partitions are unavoidable in distributed systems. So you're <em>really</em> choosing between CP (consistent but may be unavailable) and AP (available but may return stale data). This is a business decision, not just a technical one.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Real-World Examples</h3>
+        <div class="concept-box gold-box">
+          <strong>Choose CP (banking, payments, inventory):</strong> A bank account balance must be consistent. Better to return an error than to show a wrong balance. DynamoDB in strong consistency mode, PostgreSQL with synchronous replication.
+        </div>
+        <div class="concept-box green-box">
+          <strong>Choose AP (social feeds, product catalogs, DNS):</strong> If Twitter is temporarily inconsistent — showing a like count that's 2 seconds stale — nobody cares. But if Twitter goes down, millions are affected. Cassandra, DynamoDB in eventual consistency mode, Couchbase.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The PACELC Extension</h3>
+        <p>PACELC goes further: even when there's NO partition, you still face a trade-off between <strong>latency</strong> and <strong>consistency</strong>. Lower latency = more stale data possible. This is why global databases are genuinely hard.</p>
+        <div class="analogy-block">
+          <div class="a-label">🎓 Interview Tip</div>
+          Mention PACELC after CAP in interviews — it signals you've gone deeper than most. Say: "CAP is the partition scenario, but PACELC reminds us that even under normal operation, latency and consistency compete."
+        </div>
+      </div>
+
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 35 XP</div>
+        <div class="quiz-q">You're architecting a healthcare app that tracks patient medication dosages. When a network partition occurs, which is more acceptable?</div>
+        <div class="quiz-options" id="quiz-tradeoffs">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-tradeoffs', this, false, 'tradeoffs')">Show potentially stale dosage data — availability keeps nurses working</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-tradeoffs', this, true, 'tradeoffs')">Return an error or block updates — incorrect dosage data could harm patients</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-tradeoffs', this, false, 'tradeoffs')">It depends on network speed</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-tradeoffs', this, false, 'tradeoffs')">Use a NoSQL database — it handles both automatically</button>
+        </div>
+        <div class="quiz-feedback" id="qf-tradeoffs"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('tradeoffs', 90, 'lc-3'); closeModal('tradeoffs')">✓ Complete Lesson (+90 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('tradeoffs')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-diagrams">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="quest-badge">📐 Lesson 4 · Architecture Fundamentals</div>
+      <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Architecture Diagrams & Communication</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The C4 Model and how to communicate designs like a senior.</div>
+      <button class="modal-close" onclick="closeModal('diagrams')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="content-section">
+        <h3>Why Diagrams Are a Superpower</h3>
+        <p>A great architecture diagram can align a 20-person team in 10 minutes. A bad one creates confusion for months. As an SA, your ability to communicate visually is as important as your technical knowledge.</p>
+        <div class="concept-box">
+          <strong>The Golden Rule:</strong> Different audiences need different levels of abstraction. An executive needs a context diagram. A developer needs a component diagram. Never show the same diagram to both.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The C4 Model — Your Go-To Framework</h3>
+        <p>C4 stands for Context, Container, Component, and Code. It gives you 4 zoom levels for any system:</p>
+        <div class="pillars-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🌍</div><div class="p-name">L1: Context</div><div class="p-desc">Show the system + its users + external systems. For executives and stakeholders.</div></div>
+          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">📦</div><div class="p-name">L2: Container</div><div class="p-desc">Apps, databases, microservices, file stores. For senior engineers and architects.</div></div>
+          <div class="pillar" style="border-color:rgba(168,85,247,0.3)"><div class="p-icon">⚙️</div><div class="p-name">L3: Component</div><div class="p-desc">Internal components of one container. For the team building that service.</div></div>
+          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">💻</div><div class="p-name">L4: Code</div><div class="p-desc">Classes, functions. Rarely needed — usually auto-generated. For devs only.</div></div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Tools You Should Know</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">
+          <span class="tag tag-green">draw.io (free)</span>
+          <span class="tag tag-gold">Lucidchart</span>
+          <span class="tag">Miro</span>
+          <span class="tag">Structurizr (C4 native)</span>
+          <span class="tag">PlantUML (code-based)</span>
+          <span class="tag">Excalidraw (whiteboard)</span>
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Whiteboard Tip:</strong> In system design interviews, always start by drawing the context diagram before going into detail. Say "Let me establish the system boundary first." This buys you thinking time AND shows structured thinking.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The 3 Audiences & What They Need</h3>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>Executives / C-Suite:</strong> Context diagram only. No technical jargon. Focus on: what the system does, who uses it, and what business value it delivers. Use plain English labels.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>Product / Business Analysts:</strong> Container level. Explain flows in terms of user journeys. "When a customer checks out, the Order Service calls the Payment Service, which calls Stripe."
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Engineers:</strong> Component level + explicit protocols (REST, gRPC, async queue). Include data formats, ports, auth mechanisms. This is where technical precision matters.
+        </div>
+      </div>
+
+      <div class="quiz-section">
+        <div class="quiz-label">⚡ Quick Quest — 30 XP</div>
+        <div class="quiz-q">The CTO asks you to present your new microservices architecture. Which C4 diagram level do you lead with?</div>
+        <div class="quiz-options" id="quiz-diagrams">
+          <button class="quiz-opt" onclick="answerQuiz('quiz-diagrams', this, false, 'diagrams')">L3: Component — to show technical depth and impress them</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-diagrams', this, true, 'diagrams')">L1: Context — establish system boundary, users, and value first</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-diagrams', this, false, 'diagrams')">L4: Code — they'll appreciate the detail</button>
+          <button class="quiz-opt" onclick="answerQuiz('quiz-diagrams', this, false, 'diagrams')">L2: Container — it's the most informative level</button>
+        </div>
+        <div class="quiz-feedback" id="qf-diagrams"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="completeLesson('diagrams', 75, 'lc-4'); closeModal('diagrams')">✓ Complete Lesson (+75 XP)</button>
+        <button class="btn btn-ghost" onclick="closeModal('diagrams')">Save & Exit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- XP Popup -->
+<div class="xp-popup" id="xp-popup">
+  <div class="xp-amt" id="xp-amt">+75 XP</div>
+  <div class="xp-msg">Lesson Complete!</div>
+</div>
+
+<!-- Achievement Banner -->
+<div class="achievement-banner" id="achievement-banner">
+  <div class="ach-icon" id="ach-icon">🌟</div>
+  <div class="ach-title" id="ach-title">Achievement Unlocked!</div>
+  <div class="ach-desc" id="ach-desc">First Steps</div>
+</div>
+
+<script>
+  // ─── PERSISTENCE ───────────────────────────────────────────────
+  const SAVE_KEY = 'architectquest_v1';
+
+  function saveState() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        xp: state.xp,
+        xpToNext: state.xpToNext,
+        level: state.level,
+        completedLessons: [...state.completedLessons],
+        quizzesAnswered:  [...state.quizzesAnswered],
+        phase1Unlocked:   state.phase1Unlocked,
+        streak:           state.streak,
+        lastVisit:        state.lastVisit,
+        activeTab:        state.activeTab
+      }));
+    } catch(e) {}
+  }
+
+  function loadSaved() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      s.completedLessons = new Set(s.completedLessons || []);
+      s.quizzesAnswered  = new Set(s.quizzesAnswered  || []);
+      return s;
+    } catch(e) { return null; }
+  }
+
+  function calcStreak(saved) {
+    const today = new Date().toDateString();
+    if (!saved?.lastVisit) return { streak: 1, lastVisit: today };
+    const diff = Math.floor((new Date() - new Date(saved.lastVisit)) / 86400000);
+    if (diff === 0) return { streak: saved.streak || 1, lastVisit: saved.lastVisit };
+    if (diff === 1) return { streak: (saved.streak || 1) + 1, lastVisit: today };
+    return { streak: 1, lastVisit: today };
+  }
+
+  const _saved = loadSaved();
+  const _streak = calcStreak(_saved);
+
+  let state = {
+    xp:               _saved?.xp               ?? 0,
+    xpToNext:         _saved?.xpToNext         ?? 500,
+    level:            _saved?.level             ?? 1,
+    completedLessons: _saved?.completedLessons  ?? new Set(),
+    quizzesAnswered:  _saved?.quizzesAnswered   ?? new Set(),
+    phase1Unlocked:   _saved?.phase1Unlocked    ?? false,
+    streak:           _streak.streak,
+    lastVisit:        _streak.lastVisit,
+    activeTab:        _saved?.activeTab         ?? 'journey'
+  };
+
+  const ranks = [
+    [0, "Rank I — Junior Apprentice"],
+    [500, "Rank II — Apprentice Architect"],
+    [1200, "Rank III — Associate Architect"],
+    [2100, "Rank IV — Solutions Architect"],
+    [3500, "Rank V — Senior Architect"],
+    [6000, "Rank VI — Principal Architect"],
+    [10000, "Rank VII — Distinguished Architect"]
+  ];
+
+  function updateXPBar() {
+    const fill = Math.min(100, (state.xp / state.xpToNext) * 100);
+    document.getElementById('xp-fill').style.width = fill + '%';
+    document.getElementById('xp-display').textContent = state.xp + ' / ' + state.xpToNext + ' XP';
+    for (let i = ranks.length - 1; i >= 0; i--) {
+      if (state.xp >= ranks[i][0]) {
+        document.getElementById('rank-display').textContent = ranks[i][1];
+        break;
+      }
+    }
+  }
+
+  function addXP(amount) {
+    if (amount > 0) {
+      state.xp += amount;
+      saveState();
+      updateXPBar();
+      const popup = document.getElementById('xp-popup');
+      document.getElementById('xp-amt').textContent = '+' + amount + ' XP';
+      popup.classList.add('show');
+      setTimeout(() => popup.classList.remove('show'), 2500);
+    } else {
+      updateXPBar();
+    }
+  }
+
+  function openLesson(id) {
+    document.getElementById('modal-' + id).classList.add('open');
+  }
+  function closeModal(id) {
+    document.getElementById('modal-' + id).classList.remove('open');
+  }
+
+  function completeLesson(id, xp, cardId) {
+    if (state.completedLessons.has(id)) return;
+    state.completedLessons.add(id);
+    addXP(xp);
+
+    const card = document.getElementById(cardId);
+    if (card) card.classList.add('done');
+
+    // Update module progress bar
+    const p1Lessons = ['fundamentals','pillars','tradeoffs','diagrams'];
+    const doneCount = p1Lessons.filter(l => state.completedLessons.has(l)).length;
+    const segs = document.querySelectorAll('.mp-seg');
+    segs.forEach((s, i) => {
+      s.classList.remove('active','done');
+      if (i < doneCount) s.classList.add('done');
+      else if (i === doneCount) s.classList.add('active');
+    });
+
+    if (state.completedLessons.size === 1) {
+      setTimeout(() => showAchievement('🌟', 'First Steps!', 'Completed your first lesson'), 500);
+    }
+
+    // Phase 1 complete — unlock Phase 2
+    const phase1Done = p1Lessons.every(l => state.completedLessons.has(l));
+    if (phase1Done && !state.phase1Unlocked) {
+      state.phase1Unlocked = true;
+      state.level = 3;
+      saveState();
+      unlockPhase2();
+      setTimeout(() => showAchievement('🏆', 'Phase 1 Complete!', 'Cloud Foundations is now unlocked! +Level Up'), 600);
+    }
+    saveState();
+  }
+
+  // ─── RESTORE UI FROM SAVED STATE ───────────────────────────────
+  function restoreUI() {
+    // Streak counter
+    document.getElementById('streak-count').textContent = state.streak;
+
+    // Mark completed lesson cards as done
+    const cardMap = {
+      fundamentals: 'lc-1', pillars: 'lc-2', tradeoffs: 'lc-3', diagrams: 'lc-4',
+      servicemodels: 'lc-p2-1', compute: 'lc-p2-2', storage: 'lc-p2-3', iam: 'lc-p2-4'
+    };
+    state.completedLessons.forEach(id => {
+      const card = document.getElementById(cardMap[id]);
+      if (card) card.classList.add('done');
+    });
+
+    // Restore progress bar
+    const p1Lessons = ['fundamentals','pillars','tradeoffs','diagrams'];
+    const doneCount = p1Lessons.filter(l => state.completedLessons.has(l)).length;
+    const segs = document.querySelectorAll('.mp-seg');
+    segs.forEach((s, i) => {
+      s.classList.remove('active','done');
+      if (i < doneCount) s.classList.add('done');
+      else if (i === doneCount) s.classList.add('active');
+    });
+
+    // Restore answered quizzes — disable options and show correct state
+    state.quizzesAnswered.forEach(key => {
+      const opts = document.querySelectorAll('#quiz-' + key + ' .quiz-opt');
+      opts.forEach(o => {
+        o.disabled = true;
+        if (o.onclick && o.onclick.toString().includes(', true,')) o.classList.add('correct');
+      });
+      const fb = document.getElementById('qf-' + key);
+      if (fb) { fb.className = 'quiz-feedback correct show'; fb.innerHTML = '✅ Already answered — well done!'; }
+    });
+
+    // Restore Phase 2 if unlocked
+    if (state.phase1Unlocked) {
+      const tabBtn = document.getElementById('tab-phase2-btn');
+      if (tabBtn) tabBtn.style.display = 'block';
+      const cloudNode = document.getElementById('sidebar-cloud');
+      if (cloudNode) {
+        cloudNode.classList.remove('locked');
+        cloudNode.style.cursor = 'pointer';
+        cloudNode.onclick = () => document.getElementById('tab-phase2-btn').click();
+        cloudNode.querySelector('.sprog').textContent = '🔓 Unlocked!';
+        cloudNode.querySelector('.skill-check').textContent = '⚡';
+      }
+      const rmDots = document.querySelectorAll('.rm-dot');
+      if (rmDots[1]) { rmDots[1].classList.remove('locked'); rmDots[1].classList.add('active'); }
+      if (rmDots[0]) { rmDots[0].classList.remove('active'); rmDots[0].classList.add('done'); }
+    }
+
+    // Restore active tab
+    const tabIdMap = { journey:'journey', lessons:'lessons', phase2:'phase2', interview:'interview', roadmap:'roadmap' };
+    const activeTab = state.activeTab && tabIdMap[state.activeTab] ? state.activeTab : 'journey';
+    const tabEl = document.querySelector('.tab[onclick*="' + activeTab + '"]') ||
+                  document.getElementById('tab-phase2-btn');
+    if (activeTab !== 'journey') {
+      document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const panel = document.getElementById('tab-' + activeTab);
+      if (panel) panel.style.display = 'block';
+      if (tabEl) tabEl.classList.add('active');
+    }
+  }
+
+  function unlockPhase2() {
+    // Show the Phase 2 tab button
+    const tabBtn = document.getElementById('tab-phase2-btn');
+    if (tabBtn) tabBtn.style.display = 'block';
+
+    // Unlock the Cloud sidebar node
+    const cloudNode = document.getElementById('sidebar-cloud');
+    if (cloudNode) {
+      cloudNode.classList.remove('locked');
+      cloudNode.style.cursor = 'pointer';
+      cloudNode.onclick = () => { document.getElementById('tab-phase2-btn').click(); };
+      cloudNode.querySelector('.sprog').textContent = '🔓 Unlocked!';
+      cloudNode.querySelector('.skill-check').textContent = '⚡';
+      cloudNode.style.borderColor = 'rgba(255,215,0,0.6)';
+      cloudNode.style.background = 'rgba(255,215,0,0.08)';
+      setTimeout(() => { cloudNode.style.borderColor = ''; cloudNode.style.background = ''; }, 3000);
+    }
+
+    // Update roadmap dots
+    const rmDots = document.querySelectorAll('.rm-dot');
+    if (rmDots[1]) { rmDots[1].classList.remove('locked'); rmDots[1].classList.add('active'); }
+    if (rmDots[0]) { rmDots[0].classList.remove('active'); rmDots[0].classList.add('done'); }
+
+    // Auto-navigate to Phase 2 after a short delay
+    setTimeout(() => {
+      document.getElementById('tab-phase2-btn').click();
+    }, 2500);
+  }
+
+  function showAchievement(icon, title, desc) {
+    document.getElementById('ach-icon').textContent = icon;
+    document.getElementById('ach-title').textContent = title;
+    document.getElementById('ach-desc').textContent = desc;
+    const el = document.getElementById('achievement-banner');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  function answerQuiz(quizId, btn, correct, key) {
+    if (state.quizzesAnswered.has(key)) return;
+    state.quizzesAnswered.add(key);
+    saveState();
+
+    const opts = document.querySelectorAll('#' + quizId + ' .quiz-opt');
+    opts.forEach(o => o.disabled = true);
+
+    const fb = document.getElementById('qf-' + key);
+
+    if (correct) {
+      btn.classList.add('correct');
+      const bonusXP = {tradeoffs:35, pillars:30, diagrams:30, servicemodels:40, compute:40, storage:40, iam:40}[key] || 25;
+      fb.className = 'quiz-feedback correct show';
+      fb.innerHTML = '✅ <strong>Excellent!</strong> That\'s exactly the senior architect mindset. You earned +' + bonusXP + ' bonus XP!';
+      addXP(bonusXP);
+    } else {
+      btn.classList.add('wrong');
+      opts.forEach(o => { if (o.onclick.toString().includes(', true,')) o.classList.add('correct'); });
+      fb.className = 'quiz-feedback wrong show';
+      fb.innerHTML = '❌ Not quite — but that\'s how you learn! Review the lesson section above and try to articulate why the correct answer fits better.';
+    }
+  }
+
+  function revealAnswer(btn) {
+    const answer = btn.nextElementSibling;
+    answer.classList.toggle('show');
+    btn.textContent = answer.classList.contains('show') ? 'Hide Answer' : 'Reveal Model Answer';
+  }
+
+  function switchTab(id, el) {
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const panel = document.getElementById('tab-' + id);
+    if (panel) panel.style.display = 'block';
+    if (el && el.classList) el.classList.add('active');
+    state.activeTab = id;
+    saveState();
+  }
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  // ─── INIT ──────────────────────────────────────────────────────
+  restoreUI();
+  updateXPBar();
+
+  // Only show welcome achievement on first ever visit
+  if (!_saved) {
+    setTimeout(() => showAchievement('🌟', 'Quest Begins!', 'Welcome to ArchitectQuest. Your journey starts now.'), 1500);
+  }
+</script>
+</body>
+</html>
