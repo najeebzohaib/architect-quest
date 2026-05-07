@@ -712,39 +712,89 @@
     </div>
     <div class="modal-body">
       <div class="content-section">
-        <h3>Why This Matters</h3>
-        <p>Choosing the wrong service model is one of the most expensive mistakes in cloud architecture. Picking IaaS when you need PaaS means months of unnecessary infrastructure management. Picking SaaS when you need control means painful vendor lock-in later.</p>
+        <h3>Why This Decision Matters More Than People Realise</h3>
+        <p>Choosing the wrong service model is one of the most expensive architectural mistakes you can make — not because the technology itself is wrong, but because the operational consequences compound over time. Pick IaaS when you should have picked PaaS and your team spends 30% of its engineering time on infrastructure management instead of features. Pick SaaS without thinking through data ownership and you'll face a painful migration when you need custom behaviour the vendor doesn't support.</p>
+        <p>This decision also shapes your hiring. An IaaS-heavy architecture needs DevOps and SRE engineers. PaaS reduces that need significantly. These downstream consequences are what senior SAs think about before junior SAs even open a browser to compare services.</p>
       </div>
+
       <div class="content-section">
-        <h3>The Four Models</h3>
+        <h3>IaaS — Infrastructure as a Service</h3>
         <div class="concept-box">
-          <strong>🖥️ IaaS — Infrastructure as a Service</strong><br>
-          You get raw compute, storage, and networking. You manage the OS, runtime, middleware, and app. Maximum control, maximum responsibility. Use when you need fine-grained control, custom OS configs, or are lifting-and-shifting legacy workloads.<br>
-          <em style="color:var(--muted)">Examples: AWS EC2, Azure VMs, GCP Compute Engine</em>
-        </div>
-        <div class="concept-box" style="border-left-color:var(--gold)">
-          <strong>🏗️ PaaS — Platform as a Service</strong><br>
-          The cloud manages OS, runtime, and middleware. You only manage your app and data. Faster to deploy, less ops overhead. Use for web apps, APIs, and microservices where you don't need OS-level control.<br>
-          <em style="color:var(--muted)">Examples: AWS Elastic Beanstalk, Heroku, Google App Engine, Azure App Service</em>
+          <strong>🖥️ What you get:</strong> Raw virtualised compute (VMs), network, and storage. You manage everything above the hypervisor: OS installation, OS patching, runtime (Node/Python/Java), middleware, and your application.<br><br>
+          <strong>AWS:</strong> EC2 &nbsp;|&nbsp; <strong>Azure:</strong> Virtual Machines &nbsp;|&nbsp; <strong>GCP:</strong> Compute Engine
         </div>
         <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>☁️ SaaS — Software as a Service</strong><br>
-          The entire stack is managed. You just configure and use it. Zero infrastructure concern. Use for commodity tools (email, CRM, HR) where differentiation isn't needed.<br>
-          <em style="color:var(--muted)">Examples: Salesforce, Google Workspace, Slack, Datadog</em>
+          <strong>When to choose IaaS:</strong> You're lifting and shifting a legacy application that has specific OS or kernel dependencies. You need a GPU instance for machine learning or video encoding. You need a custom network topology. You have an existing 24/7 workload that justifies dedicated infrastructure. You need Windows Server with specific configurations.
         </div>
-        <div class="concept-box" style="border-left-color:var(--purple)">
-          <strong>⚡ FaaS — Function as a Service (Serverless)</strong><br>
-          You deploy individual functions triggered by events. No servers to manage, pay only per invocation. Use for event-driven workloads, async processing, and bursty irregular traffic.<br>
-          <em style="color:var(--muted)">Examples: AWS Lambda, Azure Functions, Google Cloud Functions</em>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>When NOT to choose IaaS:</strong> You're building a new greenfield web API. Your team has no DevOps capability. You're a startup that needs to move fast. You're trying to prove a concept. IaaS overhead will slow you down dramatically.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Lift-and-Shift</div>
+          A retailer has a 15-year-old ERP system running on Windows Server 2016 with a custom SQL Server configuration. It can't be containerised — it's tightly coupled to the OS, uses registry keys, and requires specific .NET Framework versions. This is a textbook IaaS use case. They lift the VMs to Azure Virtual Machines unchanged. The system runs exactly as before. Then — over 18 months — they modernise it piece by piece. IaaS was the right starting point because it unblocked the migration without requiring a full rewrite.
         </div>
       </div>
+
+      <div class="content-section">
+        <h3>PaaS — Platform as a Service</h3>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>🏗️ What you get:</strong> A managed runtime environment. You deploy your application code; the platform handles OS, patching, runtime versioning, load balancing, and basic scaling. You manage your app and data only.<br><br>
+          <strong>AWS:</strong> Elastic Beanstalk, App Runner &nbsp;|&nbsp; <strong>Azure:</strong> App Service &nbsp;|&nbsp; <strong>GCP:</strong> App Engine &nbsp;|&nbsp; <strong>Others:</strong> Heroku, Render, Railway
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>When to choose PaaS:</strong> You're building a web application or API. Your team is primarily developers, not infrastructure engineers. You want to deploy in days not months. You need built-in auto-scaling without managing it yourself. You're doing a PoC or MVP. Your code can run on a standard runtime (Node 18, Python 3.11, Java 17).
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Fintech Startup</div>
+          A 6-person fintech startup is building a loan origination API. They need to launch in 8 weeks, have no DevOps hire, and need to pass a security audit. They choose Azure App Service (PaaS). Deployment is a git push. Auto-scaling handles their variable traffic. Microsoft manages OS patching. Their 6 engineers spend 100% of their time on business logic. 8 weeks later they launch on time. Had they chosen IaaS, they'd have spent weeks configuring VMs, load balancers, and security groups — and probably missed the launch date.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>SaaS — Software as a Service</h3>
+        <div class="concept-box" style="border-left-color:var(--accent)">
+          <strong>☁️ What you get:</strong> A fully managed, fully operated application. You configure it and use it. You own nothing except your data and how you've configured the product.<br><br>
+          <strong>Examples:</strong> Salesforce (CRM), Google Workspace (email/docs), Slack (comms), Datadog (monitoring), GitHub (version control), Snowflake (data warehouse), Auth0 (authentication)
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>When to choose SaaS:</strong> The capability is not your core business differentiator. The problem is solved commodity software. You want zero operational overhead for this capability. You can accept the vendor's data residency and security posture. The integration APIs are sufficient for your needs.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>The SaaS trap — vendor lock-in:</strong> Three years after adopting a SaaS CRM, a company needs to export all their customer interaction history to feed a new AI model. The vendor charges £50,000 for a bulk data export and the format is proprietary. Always negotiate data portability rights upfront, and understand the export formats before you commit.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 The Build vs Buy Rule:</strong> "If it's not your core differentiator, buy it." Authentication, email delivery, monitoring, CRM — these are solved problems. Building them yourself is a distraction. Your competitive advantage is your core product, not the authentication layer that wraps it.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>FaaS — Function as a Service (Serverless)</h3>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>⚡ What you get:</strong> You write individual functions that are triggered by events. The platform handles everything: scaling from zero to millions of invocations, infrastructure, patching, runtime. You pay per execution (typically £0.0000002 per invocation).<br><br>
+          <strong>AWS:</strong> Lambda &nbsp;|&nbsp; <strong>Azure:</strong> Functions &nbsp;|&nbsp; <strong>GCP:</strong> Cloud Functions
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>When to choose FaaS:</strong> Event-driven processing (file uploaded → process it). Irregular or unpredictable traffic patterns. Scheduled jobs (cron). Lightweight API backends. Glue code between services. Anywhere you'd previously have written a script on a server.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>FaaS limitations to know:</strong> Cold starts add latency (50ms–3s depending on runtime and configuration). Maximum execution time of 15 minutes on Lambda. Not suitable for long-running processes. Stateless by nature — can't hold connections. Debugging and local development are harder. Can get expensive at very high sustained throughput compared to a reserved container.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Document Processing Pipeline</div>
+          An insurance company receives 50,000 PDF policy documents per month for processing — but they arrive in batches, often thousands in a few hours followed by days of nothing. With EC2, they'd have to keep enough servers running to handle peak load 24/7. With Lambda: when a PDF is uploaded to S3, an event triggers a Lambda function. Lambda auto-scales to process 1,000 PDFs simultaneously. When the batch is done, it scales back to zero. Cost before: £1,200/month (always-on EC2). Cost after: £38/month (Lambda, pay per invocation). This is the killer use case for FaaS.
+        </div>
+      </div>
+
       <div class="content-section">
         <h3>The Shared Responsibility Model</h3>
-        <p>A key concept for security interviews: as you move from IaaS → PaaS → SaaS, the cloud provider takes on more responsibility. With IaaS you own OS patching; with SaaS the vendor handles everything. You're always responsible for your data and access control.</p>
-        <div class="concept-box gold-box">
-          <strong>🎯 Interview Answer Frame:</strong> "I start by asking — does our team have the operational maturity to manage this layer? If not, abstract it away. Every layer you manage yourself is engineering time not spent on business value."
+        <p>As you move from IaaS → PaaS → SaaS → FaaS, you give up control and gain simplicity. The cloud provider takes on more of the security and operational burden. But you always retain responsibility for:</p>
+        <div class="concept-box">
+          <strong>Your permanent responsibilities regardless of model:</strong><br>
+          Identity and Access Management (who can access what) · Your application's logic and business rules · Your data (classification, encryption keys, retention policies) · Correctly configuring the services you consume · Compliance with regulations that apply to your data
         </div>
+        <p>A common misconception: "We're on SaaS/PaaS so security is the vendor's problem." It isn't. The vendor secures the platform. You secure how you use it — the permissions, the data you put in it, the API keys you generate, and the integrations you build.</p>
       </div>
+
       <div class="quiz-section">
         <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
         <div class="quiz-q">A startup wants to launch a CRUD web API in 2 weeks. They have 2 backend devs and no DevOps engineer. What's the best service model?</div>
@@ -769,35 +819,82 @@
     <div class="modal-top">
       <div class="quest-badge">⚙️ Phase 2 · Cloud Foundations</div>
       <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Compute: VMs, Containers & Serverless</div>
-      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The three compute paradigms — and how to pick the right one.</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">The three compute paradigms — and how to pick the right one every time.</div>
       <button class="modal-close" onclick="closeModal('compute')">×</button>
     </div>
     <div class="modal-body">
       <div class="content-section">
         <h3>The Three Compute Paradigms</h3>
-        <div class="concept-box">
-          <strong>🖥️ Virtual Machines (EC2, Azure VMs)</strong><br>
-          Full OS, persistent, long-running. Boot time: minutes. Best for: stateful apps, legacy lifts, workloads needing GPU/custom OS. Downside: you pay whether idle or busy, and you manage patching.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--gold)">
-          <strong>🐳 Containers (ECS, EKS, GKE)</strong><br>
-          Lightweight, portable, share the host OS kernel. Boot time: seconds. Best for: microservices, consistent dev-to-prod environments, scaling individual services independently. Kubernetes is the de-facto orchestrator — know it exists even if you don't operate it yourself.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--purple)">
-          <strong>⚡ Serverless (Lambda, Cloud Functions)</strong><br>
-          Event-triggered, stateless, ephemeral. Boot time: milliseconds (with warm containers) to seconds (cold start). Best for: async jobs, event processing, APIs with irregular traffic. Downside: cold starts, 15-min max execution, harder to debug locally.
-        </div>
+        <p>Every workload you'll ever architect runs on one of these three models — or a combination. The right choice dramatically affects your operational burden, cost profile, scaling behaviour, and the team skills you need. Getting this wrong doesn't just cost money — it shapes the engineering culture of the team for years.</p>
       </div>
+
       <div class="content-section">
-        <h3>Decision Framework</h3>
-        <div class="analogy-block">
-          <div class="a-label">🧭 How to Choose</div>
-          Ask: Is workload <strong>event-driven and short-lived</strong>? → Serverless. Is it a <strong>microservice that needs to scale independently</strong>? → Container. Does it need a <strong>specific OS, GPU, or run continuously</strong>? → VM.
+        <h3>Virtual Machines (EC2, Azure VMs, GCP Compute)</h3>
+        <div class="concept-box">
+          <strong>🖥️ How it works:</strong> A hypervisor (Xen, Hyper-V, KVM) virtualises physical hardware. You get a slice of a physical server that behaves like a dedicated machine. You choose the OS, install software, configure networking. Boot time: 1–3 minutes. Persistence: runs until you stop it. Billing: by the second (AWS) or minute, even when idle.
         </div>
-        <div class="concept-box gold-box">
-          <strong>🎯 Senior SA Move:</strong> Mention that most modern architectures mix all three. Serverless for async triggers, containers for core APIs, VMs for databases or GPU workloads. Avoid the trap of picking one and applying it everywhere.
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Best for:</strong> Long-running stateful services. Custom OS/kernel requirements. GPU workloads (ML training, video rendering). Lift-and-shift migrations. High-performance databases that need direct disk access. Workloads with predictable, sustained load where Reserved Instances give 60–72% cost savings.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>Watch out for:</strong> You're responsible for OS patching — miss a critical CVE and you're exposed. Vertical scaling (making the VM bigger) requires a reboot and brief downtime. Idle VMs still cost money — teams forget to stop dev/test environments. Snowflake servers: VMs that have been manually tweaked so many times nobody knows what's on them.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Pattern — Graviton Instances</div>
+          AWS Graviton3 (ARM-based) instances offer 40% better price-performance than equivalent x86 instances for most workloads. Netflix migrated a significant portion of their EC2 fleet to Graviton and reported 40% cost savings with equal or better performance. If you're recommending EC2 in 2024, you should be recommending Graviton unless there's a specific reason not to (x86-only binary dependencies, for example). Mentioning this in an interview signals you're current.
         </div>
       </div>
+
+      <div class="content-section">
+        <h3>Containers (Docker, ECS, EKS, GKE, AKS)</h3>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>🐳 How it works:</strong> Containers package your application code + runtime + dependencies into a portable image. Multiple containers share the host OS kernel but are isolated from each other. No OS to manage per container. Boot time: seconds. Images are immutable — the same image runs in dev, staging, and production. This eliminates "works on my machine" problems.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Best for:</strong> Microservices architectures. Teams wanting consistent dev/prod parity. Applications that need to scale independently (scale just the checkout service, not the whole app). Multi-cloud portability. CI/CD pipelines (build once, deploy anywhere).
+        </div>
+        <div class="concept-box">
+          <strong>Container orchestration with Kubernetes (K8s):</strong> When you have many containers, you need something to manage them — scheduling them onto nodes, restarting failed containers, managing network routing, rolling deployments. Kubernetes does all this. EKS (AWS), GKE (Google), and AKS (Azure) are managed Kubernetes services — they handle the control plane so you only manage the worker nodes and your workloads. For most teams, a managed K8s service is the right choice over self-managed.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — Spotify's Container Journey</div>
+          Spotify started with ~150 manually managed VMs per service. Deployments took 30+ minutes and required coordination between teams. After containerising with Docker and moving to Kubernetes, they reduced deployment time to under 2 minutes, improved resource utilisation by 3x (fewer machines doing more work), and gave individual teams full ownership of their service lifecycle. The shift from VMs to containers was one of the biggest engineering productivity improvements in their history.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Serverless / FaaS (Lambda, Cloud Functions, Azure Functions)</h3>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>⚡ How it works:</strong> You deploy a function (a piece of code). The platform spins up an execution environment when an event triggers it, runs your code, and tears it down. You never see a server. Scaling is automatic and instantaneous. You pay only for actual execution time, measured in milliseconds.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Best for:</strong> Event-driven processing (S3 upload → resize image, SQS message → process order). API backends with variable or unpredictable traffic. Scheduled jobs. Glue code and automation. Anything where you'd previously have cron'd a script on a server. Startups that want zero idle cost.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>Cold start problem — explained properly:</strong> When no execution environment exists for your function, AWS must initialise one. For a Node.js function this takes ~200ms. For Java with Spring Boot it can take 3–5 seconds. This "cold start" latency only happens when there's been no traffic for a while. Solutions: Provisioned Concurrency (Lambda keeps warm instances ready, but you pay for them), lighter runtimes (use Node/Python/Go instead of Java for latency-sensitive functions), or SnapStart (AWS's JVM optimisation feature).
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Cost Comparison — Lambda vs Always-On EC2</div>
+          A webhook processor receives 2 million events per month. Each takes ~100ms to process.<br><br>
+          <strong>EC2 t3.small (always-on):</strong> ~£12/month regardless of load<br>
+          <strong>Lambda:</strong> 2M × 100ms × 128MB RAM = ~£0.34/month<br><br>
+          Lambda is 35x cheaper here. But flip the scenario: 100M events/month with sustained high traffic — Lambda becomes £17/month while a reserved EC2 instance handling the load is £8/month. The crossover point matters. Know your traffic pattern before you commit.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The Decision Framework</h3>
+        <div class="concept-box gold-box">
+          <strong>🧭 How to choose in an interview or real project:</strong><br><br>
+          1. <strong>Is it event-driven and short-lived (&lt;15 min)?</strong> → Serverless (Lambda)<br>
+          2. <strong>Does it need to run continuously or hold state?</strong> → VM or Container<br>
+          3. <strong>Does it need to scale independently from other services?</strong> → Container<br>
+          4. <strong>Does it have specific OS/kernel/GPU requirements?</strong> → VM<br>
+          5. <strong>Is your team small with no DevOps?</strong> → Fargate (managed containers, no node management) or Lambda<br><br>
+          Most modern architectures mix all three: Lambda for async triggers, containers (Fargate/ECS) for core APIs, VMs for databases or GPU workloads.
+        </div>
+      </div>
+
       <div class="quiz-section">
         <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
         <div class="quiz-q">A system needs to resize images whenever a user uploads a photo. Traffic is unpredictable — sometimes zero, sometimes thousands of uploads per minute. Best compute choice?</div>
@@ -822,32 +919,77 @@
     <div class="modal-top">
       <div class="quest-badge">🗄️ Phase 2 · Cloud Foundations</div>
       <div class="quest-title" style="font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:white;margin-top:8px">Storage: Object, Block & File</div>
-      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Three storage types, three completely different use cases.</div>
+      <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Three fundamentally different storage types — knowing which to use and why is a core SA skill.</div>
       <button class="modal-close" onclick="closeModal('storage')">×</button>
     </div>
     <div class="modal-body">
       <div class="content-section">
-        <h3>The Three Storage Types</h3>
+        <h3>Why Storage Choice is More Consequential Than It Looks</h3>
+        <p>Storage decisions are some of the hardest to undo. Once you've built your application to write to block storage, migrating to object storage is a significant engineering effort. Once you've stored petabytes in one format, moving it is expensive and time-consuming. Getting this right at design time is critical.</p>
+        <p>Storage also has major cost implications. Object storage (S3) costs £0.023/GB/month. Block storage (EBS gp3) costs £0.088/GB/month — nearly 4x more. File storage (EFS) costs £0.30/GB/month — 13x more than S3. Choosing block storage for data that should live in S3 can mean paying 4x more for the same bytes.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>Object Storage — S3, Azure Blob, GCS</h3>
         <div class="concept-box">
-          <strong>🪣 Object Storage (S3, GCS, Blob)</strong><br>
-          Stores files as objects with metadata. Flat namespace. Accessed via HTTP/API. Infinitely scalable, cheap, durable (99.999999999% — "11 nines"). Use for: images, videos, backups, static websites, data lake raw files, ML training datasets.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--gold)">
-          <strong>💾 Block Storage (EBS, Azure Disk)</strong><br>
-          Raw storage volumes attached to a single VM. Low latency, high IOPS. Works like a hard drive. Use for: OS volumes, databases (PostgreSQL, MySQL), any app needing a mounted filesystem on one server.
+          <strong>🪣 How it works:</strong> Files are stored as objects — each has a unique key (essentially a path), the data itself, and metadata. There's no file system hierarchy — it's a flat namespace. You access objects via HTTP API (PUT to write, GET to read). Infinitely scalable — S3 can store exabytes. Durability: 99.999999999% (11 nines) — meaning if you store 10 million objects, you can expect to lose one every 10,000 years.
         </div>
         <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>📁 File Storage (EFS, Azure Files, FSx)</strong><br>
-          Shared filesystem mounted by multiple instances simultaneously. NFS-style. Use for: shared content repos, CMS media, HPC shared scratch space, lift-and-shift of apps expecting a shared drive.
+          <strong>Use for:</strong> User-uploaded files (images, videos, documents). Static website hosting. Application backups and disaster recovery. Data lake raw/processed layers. Machine learning training datasets. Log archives. Distribution of software or media via CDN. Anything accessed via URL.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>S3 Storage Classes — know these for interviews:</strong><br>
+          <code>S3 Standard</code> — frequent access, highest cost. <code>S3 Standard-IA</code> — infrequent access, 40% cheaper but retrieval fee. <code>S3 Glacier Instant Retrieval</code> — archive with millisecond retrieval. <code>S3 Glacier Deep Archive</code> — cheapest (£0.001/GB) but 12-hour retrieval. <code>S3 Intelligent-Tiering</code> — automatically moves data between tiers based on access patterns. Mentioning tiering classes in a cost optimisation discussion always impresses interviewers.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — Netflix and S3</div>
+          Netflix stores the master copies of every piece of content they've ever licensed or produced in S3 — hundreds of petabytes. They transcode each title into 1,200+ different encoding variants (different resolutions, codecs, bitrates for different devices and network conditions) and store all variants in S3. CloudFront CDN serves them globally. The entire content delivery pipeline is built on object storage. There is no "file server" in the traditional sense. This is object storage at its most powerful.
         </div>
       </div>
+
       <div class="content-section">
-        <h3>Quick Decision Rule</h3>
-        <p><strong>Multiple instances need to read/write simultaneously?</strong> → File storage. <strong>One instance needs a fast disk?</strong> → Block. <strong>Storing files/objects accessed via API or URL?</strong> → Object.</p>
-        <div class="concept-box gold-box">
-          <strong>🎯 Interview Pattern:</strong> "For our data lake we used S3 as the raw layer — cheap, durable, queryable via Athena. For our application databases we used EBS gp3 volumes — low latency, predictable IOPS. For our shared rendering cluster we needed EFS so all nodes could access the same asset files."
+        <h3>Block Storage — EBS, Azure Managed Disks, GCP Persistent Disks</h3>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>💾 How it works:</strong> A raw storage volume attached to a single VM — behaves exactly like a physical hard drive. The OS formats it with a filesystem (ext4, NTFS) and mounts it. Sub-millisecond latency. High IOPS (EBS gp3 gives you 3,000 IOPS baseline, up to 16,000). Can only be attached to one EC2 instance at a time (with some exceptions for EBS Multi-Attach).
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Use for:</strong> Operating system volumes for EC2 instances. Relational databases (PostgreSQL, MySQL, Oracle) — they need low-latency disk access for write-ahead logs and data files. Any application that needs a traditional mounted filesystem. High-frequency transaction processing where latency matters.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>Common mistake — orphaned volumes:</strong> When an EC2 instance is terminated, its attached EBS volumes are not automatically deleted by default. They remain — and you keep paying for them. A common FinOps finding is dozens of EBS volumes paying £0.088/GB/month for data nobody is using. Always set the DeleteOnTermination flag unless you specifically need the data to survive instance termination.
         </div>
       </div>
+
+      <div class="content-section">
+        <h3>File Storage — EFS, Azure Files, FSx</h3>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>📁 How it works:</strong> A Network File System (NFS) that multiple compute instances can mount simultaneously. Unlike block storage (one instance only), file storage can be attached to hundreds of containers or VMs at the same time. All instances see the same files in real time. Managed by the cloud provider — you never manage the underlying disk.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--accent)">
+          <strong>Use for:</strong> Shared content repositories accessed by multiple servers. CMS media libraries where multiple web servers need to read/write the same image files. HPC (High Performance Computing) clusters where compute nodes share a scratch workspace. Lift-and-shift of applications that expect a shared network drive. Container clusters that need a shared persistent volume.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Media Processing Cluster</div>
+          A broadcast company runs a cluster of 50 video processing workers. Each worker picks up a job, reads the source video, processes it, and writes the output. All 50 workers need to access the same input and output directories. With block storage (EBS), each worker would need its own copy of the video — 50x storage cost and the need to sync files between workers. With EFS, all 50 workers mount the same filesystem. One copy of every file, accessible to all workers simultaneously. This is the canonical file storage use case.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The Decision Framework + Real Architecture Example</h3>
+        <div class="concept-box gold-box">
+          <strong>🧭 Quick Decision Rules:</strong><br>
+          Multiple instances need to read/write simultaneously? → <strong>File (EFS)</strong><br>
+          One instance needs a fast local disk (database, OS)? → <strong>Block (EBS)</strong><br>
+          Storing files accessed via API, URL, or CDN? → <strong>Object (S3)</strong><br>
+          Archiving data you rarely access? → <strong>Object with Glacier tier</strong><br>
+          Sharing files between containers in the same cluster? → <strong>EFS or a shared object store</strong>
+        </div>
+        <div class="concept-box">
+          <strong>Real architecture using all three:</strong><br>
+          A media platform uses: <code>S3</code> for user-uploaded videos and processed outputs (cheap, durable, CDN-integrated) · <code>EBS gp3</code> for the PostgreSQL database that stores user accounts and video metadata (low latency, high IOPS for transactional data) · <code>EFS</code> for the shared rendering workspace used by a cluster of 20 video processing workers (all nodes read/write the same working files simultaneously). Three storage types, three different jobs — each perfectly matched.
+        </div>
+      </div>
+
       <div class="quiz-section">
         <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
         <div class="quiz-q">A video streaming platform needs to store millions of user-uploaded videos, serve them globally via CDN, and run ML jobs against them. Which storage type?</div>
@@ -877,37 +1019,71 @@
     </div>
     <div class="modal-body">
       <div class="content-section">
-        <h3>The Golden Rule: Least Privilege</h3>
-        <p>Every identity (human or machine) should have the <strong>minimum permissions needed to do its job — nothing more</strong>. This is the single most important IAM principle. Violating it is the root cause of the majority of cloud breaches.</p>
-        <div class="analogy-block">
-          <div class="a-label">🏢 Analogy</div>
-          A hotel cleaner has a key card that opens guest rooms — but not the safe, the server room, or the CEO's office. IAM is your key card system. Every service, user, and role gets exactly the doors they need.
-        </div>
+        <h3>Why IAM is the Highest-Leverage Security Control</h3>
+        <p>The majority of significant cloud security breaches trace back to IAM failures — not sophisticated exploits, but basic mistakes: credentials hardcoded in GitHub repos, overly broad permissions that should have been scoped, service accounts with admin access "just in case," root account used for day-to-day work. IAM is not glamorous, but it is the single highest-impact security control in your architecture.</p>
+        <p>The 2019 Capital One breach (100 million customer records) was caused by two IAM failures: a misconfigured WAF that allowed SSRF, and an EC2 metadata role with permissions far broader than needed. If the role had only had access to the specific S3 bucket it needed — nothing else — the breach would have been contained. Least privilege would have saved them £80M in fines and immeasurable reputational damage.</p>
       </div>
+
       <div class="content-section">
-        <h3>Core IAM Concepts</h3>
+        <h3>The Principal Hierarchy — Who Can Do What</h3>
         <div class="concept-box">
-          <strong>Users vs Roles vs Groups</strong><br>
-          <em>Users</em> = individual humans with long-term credentials (avoid for services). <em>Roles</em> = temporary credentials assumed by services, lambdas, or cross-account access (prefer this). <em>Groups</em> = attach policies to multiple users at once.
+          <strong>Users (IAM Users):</strong> Long-lived credentials (access key + secret) tied to a specific human or application. The access key is like a username/password that never expires unless rotated. <strong>Avoid for services and automation</strong> — if the key leaks (e.g., accidentally pushed to GitHub), it's valid until manually revoked. Use for: individual humans who need programmatic access when federation isn't yet set up.
         </div>
         <div class="concept-box" style="border-left-color:var(--gold)">
-          <strong>Policies</strong><br>
-          JSON documents that define Allow/Deny for specific Actions on specific Resources. Explicit Deny always wins over Allow. Use managed policies for common patterns, inline policies for specific exceptions.
+          <strong>Roles (IAM Roles):</strong> Temporary credentials, automatically rotated, assumed by services or humans. An EC2 instance with an IAM Role gets credentials that automatically expire every hour and are refreshed by the AWS metadata service. A Lambda function assumes its execution role for the duration of the invocation. <strong>Always prefer roles over users for services.</strong> There are no long-lived credentials to leak.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>Groups:</strong> A collection of users. Attach permissions to the group, not to individual users. When someone joins the DevOps team, add them to the DevOps group — they inherit all permissions. When they leave, remove them from the group — all permissions gone. Simpler to manage at scale than per-user policies.
         </div>
         <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>Service Accounts & Federation</strong><br>
-          Never hardcode AWS keys in code. Use IAM Roles for EC2/Lambda (instance profiles). For human users, federate with your Identity Provider (Okta, Azure AD) via SAML or OIDC — single sign-on, central revocation.
+          <strong>Service Control Policies (SCPs):</strong> Organisation-level guardrails that apply to all accounts in your AWS Organisation. If you have 50 AWS accounts, an SCP can say "no account in this org is ever allowed to disable CloudTrail" or "no account can create resources outside eu-west-1 and eu-west-2." SCPs are like circuit breakers — even if an account's admin tries to violate the policy, they can't. This is advanced IAM but it's what enterprise architects implement.
         </div>
       </div>
+
       <div class="content-section">
-        <h3>IAM Best Practices (Interview Checklist)</h3>
+        <h3>Policies — The Permission Language</h3>
+        <p>IAM Policies are JSON documents that define what actions are allowed or denied on what resources. Every API call in AWS is controlled by a policy evaluation. Understanding how policies evaluate is essential for secure architecture.</p>
+        <div class="concept-box">
+          <strong>Policy evaluation logic (memorise this):</strong><br>
+          1. Start with <strong>implicit Deny</strong> — everything is denied by default<br>
+          2. Any <strong>explicit Allow</strong> grants access<br>
+          3. Any <strong>explicit Deny always wins</strong> — even over an Allow<br><br>
+          This means: if you have an Allow policy for S3:* and a Deny policy for S3:DeleteObject, the Deny wins. You can write to S3 but never delete. Explicit Deny is your safety net for dangerous operations.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>Wildcard permissions — the danger zone:</strong><br>
+          <code>"Action": "*"</code> means the role can call any AWS API.<br>
+          <code>"Resource": "*"</code> means the permission applies to every resource in your account.<br><br>
+          Combining both (<code>"Action": "*", "Resource": "*"</code>) is essentially root access. This pattern appears in "quick fix" policies all the time and is a critical finding in any security review. Always scope to the minimum Action and specific Resource ARNs.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Policy — Lambda to Specific S3 Bucket</div>
+          Bad policy (wildcard): grants Lambda access to all S3 buckets in your account. One Lambda bug could expose all your data.<br><br>
+          Good policy: <code>Action: ["s3:GetObject", "s3:PutObject"]</code>, <code>Resource: "arn:aws:s3:::my-uploads-bucket/*"</code>. This Lambda can only read/write to one specific bucket. If it's compromised, the blast radius is limited to that one bucket, not your entire S3 estate.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Federation — The Enterprise Standard</h3>
+        <p>Large organisations don't create individual IAM Users for every employee. They use their existing Identity Provider (IdP) — typically Active Directory, Okta, or Azure AD — and <em>federate</em> access to AWS. This means:</p>
+        <div class="concept-box">
+          <strong>SAML 2.0 / OIDC Federation:</strong> Employee logs into Okta with their company credentials. Okta asserts their identity to AWS. AWS issues temporary credentials valid for the session. No IAM User exists — the human's identity lives in the IdP. When an employee leaves, disabling their Okta account immediately revokes all AWS access. Central governance, no stale credentials.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>AWS IAM Identity Centre (formerly SSO):</strong> AWS's managed federation service. Integrates with Active Directory or external IdPs. Gives employees a single portal to access multiple AWS accounts with appropriate permissions. Logs all access. This is the recommended approach for any organisation with more than a handful of AWS accounts.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>IAM Best Practices — Your Security Checklist</h3>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
-          <span class="tag">Enable MFA on root</span><span class="tag">Never use root account daily</span><span class="tag">Rotate access keys</span><span class="tag">Use roles not users for services</span><span class="tag">Audit with CloudTrail</span><span class="tag">Use permission boundaries</span><span class="tag">SCPs for org-wide guardrails</span>
+          <span class="tag">Enable MFA on root</span><span class="tag">Lock away root credentials</span><span class="tag">Never use root for day-to-day</span><span class="tag">Rotate access keys &lt;90 days</span><span class="tag">Use roles not users for services</span><span class="tag">Audit with CloudTrail</span><span class="tag">Use permission boundaries</span><span class="tag">SCPs for org-wide guardrails</span><span class="tag">Review unused permissions with IAM Access Analyser</span><span class="tag">No wildcard actions</span>
         </div>
         <div class="concept-box gold-box">
-          <strong>🎯 Senior SA Answer:</strong> "I'd enforce least privilege via IAM roles with permission boundaries, federate human access through our IdP, enable CloudTrail for all API calls, and use AWS Config rules to continuously audit for overly permissive policies — flagging any * wildcard actions automatically."
+          <strong>🎯 Senior SA Interview Answer on IAM:</strong> "I'd enforce least privilege using IAM Roles for all service-to-service access — never long-lived access keys. I'd federate human access through our IdP via IAM Identity Centre, so employee lifecycle management is centralised. I'd use SCPs at the organisation level to enforce guardrails like CloudTrail being always-on and resource creation locked to approved regions. I'd run IAM Access Analyser continuously to flag overly permissive policies, and review the CloudTrail logs with automated alerting for any high-risk API calls like root account usage or policy changes."
         </div>
       </div>
+
       <div class="quiz-section">
         <div class="quiz-label">⚡ Quick Quest — 40 XP</div>
         <div class="quiz-q">A Lambda function needs to read from an S3 bucket. What's the correct way to grant it access?</div>
@@ -940,8 +1116,27 @@
         <p>A Solutions Architect is the translator between <strong>what the business needs</strong> and <strong>what technology can deliver</strong> — making complex technical decisions that have real commercial consequences.</p>
         <div class="analogy-block">
           <div class="a-label">🏗️ Real World Analogy</div>
-          Think of yourself as an architect designing a skyscraper. You don't lay every brick yourself — but you make the critical decisions: structural load, materials, safety systems, and aesthetics. The builders (engineers) execute your plan. If your plan is wrong, the building falls. If it's brilliant, it stands for 50 years.
+          Think of yourself as an architect designing a skyscraper. You don't lay every brick yourself — but you make the critical decisions: structural load, materials, safety systems, and aesthetics. The builders (engineers) execute your plan. If your plan is wrong, the building falls. If it's brilliant, it stands for 50 years. An architect who just draws pretty pictures without understanding load-bearing physics isn't an architect — they're a liability. Same applies to you.
         </div>
+        <p>In practice, this means you will routinely sit in a room where the CTO wants to move fast, the security team wants to slow down, the CFO wants to cut costs, and the engineering team wants to use the latest technology. Your job is to propose an architecture that threads that needle — and explain <em>why</em> in terms each person understands.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>What Do You Actually Do Day to Day?</h3>
+        <p>This varies by company, but a typical week as an SA at a mid-size tech company looks like this:</p>
+        <div class="concept-box">
+          <strong>Monday:</strong> Requirements workshop with a product team building a new payments feature. You ask probing questions: How many transactions per second at peak? What's our SLA? Does this touch PCI-DSS data? You leave with a list of constraints that will shape every decision.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>Tuesday–Wednesday:</strong> You sketch out 3 candidate architectures — one cheap and fast to build, one that scales to 10x current load, one that a small team can actually operate. You document the trade-offs of each in an Architecture Decision Record (ADR).
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>Thursday:</strong> Architecture review. You present your preferred option to a mix of engineers, a product manager, and a security lead. You defend your choices under questioning. The security lead raises a concern about token storage — you hadn't considered that angle. You revise.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Friday:</strong> You update the ADR with the final decision and its rationale. You write a one-pager for the CTO. You pair with the lead engineer to make sure they understand the design intent before they start coding.
+        </div>
+        <p style="margin-top:12px">Notice: you didn't write much code. You wrote documents, asked questions, drew diagrams, and made decisions. <strong>Communication is 60% of the job.</strong></p>
       </div>
 
       <div class="content-section">
@@ -957,24 +1152,66 @@
       </div>
 
       <div class="content-section">
-        <h3>Junior vs Senior Mindset</h3>
+        <h3>Junior vs Senior Mindset — With Real Examples</h3>
         <div class="concept-box">
           <strong>Junior SA thinks:</strong> "What's the best technology for this?"<br>
           <strong>Senior SA thinks:</strong> "What's the best outcome for the business — and which technology gets us there with acceptable risk and cost?"
         </div>
-        <p>The shift is from <em>technology-first</em> to <em>outcome-first</em> thinking. This is the single most important mindset upgrade in your journey.</p>
+        <p>This isn't abstract. Here's the same scenario handled two ways:</p>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>❌ Junior response</strong> to "We need real-time notifications":<br><br>
+          "Let's use WebSockets — they're the fastest and most modern option. I'll set up a WebSocket server on EC2."<br><br>
+          <em style="color:var(--muted)">Problem: WebSockets require persistent connections, meaning you can't easily load balance them. The EC2 instance becomes a single point of failure. When you need to scale, you'll have to re-architect everything.</em>
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>✅ Senior response</strong> to "We need real-time notifications":<br><br>
+          "Before I recommend a solution — how many concurrent users do we expect? Are these notifications one-directional (server → client) or bidirectional? Do users need to receive notifications when the app is closed? What's our existing stack?"<br><br>
+          <em style="color:var(--muted)">After hearing the answers: "For mostly server-to-client, Server-Sent Events (SSE) is simpler and more scalable than WebSockets. If users need notifications when the app is closed, we need push notifications via FCM/APNs. If it's truly bidirectional with high frequency, then WebSockets with a managed service like AWS API Gateway is the right call — not self-managed."</em>
+        </div>
+        <p>The senior SA gave a better answer <em>because they asked better questions first</em>. That is the whole game.</p>
         <div class="concept-box gold-box">
-          <strong>🎯 Interview Gold:</strong> When asked a design question, <em>always start</em> by asking about business requirements, scale expectations, budget constraints, and acceptable downtime. Interviewers reward this instinct.
+          <strong>🎯 Interview Gold:</strong> When asked a design question, <em>always start</em> by asking about business requirements, scale expectations, budget constraints, and acceptable downtime. Say out loud: "Before I dive in, I have a few clarifying questions." Interviewers actively look for this — it's how they tell apart people who've read about architecture versus people who've practised it.
         </div>
       </div>
 
       <div class="content-section">
+        <h3>Architecture Decision Records (ADRs) — Your Paper Trail</h3>
+        <p>One of the most underrated skills of a senior SA is documenting <em>why</em> decisions were made, not just what was decided. An ADR is a short document (usually 1–2 pages) that captures:</p>
+        <div class="concept-box">
+          <strong>Status:</strong> Proposed / Accepted / Deprecated<br>
+          <strong>Context:</strong> What situation forced this decision?<br>
+          <strong>Decision:</strong> What did we choose?<br>
+          <strong>Consequences:</strong> What are the trade-offs we accepted?
+        </div>
+        <p>Two years from now, when a new engineer asks "why on earth did we build it this way?" — the ADR has the answer. Without it, institutional knowledge dies when people leave. Senior SAs write ADRs for every significant decision. It also protects you: if the decision turns out to be wrong, the ADR shows you made a reasonable choice given the information available at the time.</p>
+      </div>
+
+      <div class="content-section">
         <h3>The SA's Non-Functional Requirements (NFRs)</h3>
-        <p>These are the invisible requirements that define your architecture quality. Memorise these — they appear in every design discussion:</p>
+        <p>These are the invisible requirements that define your architecture quality. Unlike functional requirements ("the user can reset their password"), NFRs cut across the entire system. Missing them at design time is extremely expensive to fix later.</p>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
           <span class="tag">Scalability</span><span class="tag">Availability</span><span class="tag">Reliability</span><span class="tag">Performance</span><span class="tag">Security</span><span class="tag">Maintainability</span><span class="tag">Observability</span><span class="tag">Cost-efficiency</span><span class="tag">Compliance</span><span class="tag">Portability</span>
         </div>
-        <p>Senior architects don't wait to be asked about NFRs — they proactively raise them. Every design decision should be traceable back to one of these.</p>
+        <div class="concept-box">
+          <strong>Real example of an NFR being missed:</strong> A startup builds a healthcare app. They focus entirely on features. Nobody specifies that patient data must be encrypted at rest and in transit (a compliance NFR). Six months in, they're in talks with NHS. NHS requires DSPT compliance. The team discovers half their database fields are stored unencrypted. Re-architecting this costs 3 months of engineering time and delays the NHS deal by a quarter. A single conversation about NFRs at the start would have prevented this.
+        </div>
+        <p>Senior architects don't wait to be asked about NFRs — they proactively raise them in every kickoff meeting. A useful habit: after any requirements discussion, go through the NFR list and ask "have we talked about this one?" for each item.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>Real War Story: When SA Thinking Saves a Project</h3>
+        <div class="analogy-block">
+          <div class="a-label">📖 Case Study — E-commerce Flash Sale</div>
+          An e-commerce company is planning a Black Friday flash sale. The marketing team tells engineering: "We're expecting 10x our normal traffic for 4 hours." A junior engineer proposes upgrading all servers to the next size up — vertical scaling.<br><br>
+          The SA stops the meeting and asks five questions:<br>
+          1. What's our current peak, and what's the predicted peak in absolute numbers?<br>
+          2. Which parts of the system are actually the bottleneck — web servers, database, or third-party payment API?<br>
+          3. What's the cost of a 1-hour outage during the sale vs. the cost of over-provisioning?<br>
+          4. Do we need to scale before the sale or can we use auto-scaling during it?<br>
+          5. What's our rollback plan if the new infrastructure behaves unexpectedly?<br><br>
+          The answers reveal: the database is the real bottleneck, not the web servers. The SA recommends adding read replicas and a Redis caching layer in front of the product catalog — the most-read data. Total cost: £200/month extra for 2 weeks of testing plus the sale period. The vertical scaling plan would have cost £4,000 and wouldn't have solved the actual problem. The sale goes flawlessly.
+        </div>
+        <p>This is what being a Solutions Architect actually looks like in practice. It's not about knowing every technology — it's about asking the right questions and connecting the answers to the right solution.</p>
       </div>
 
       <!-- QUIZ -->
@@ -1009,46 +1246,108 @@
     <div class="modal-body">
       <div class="content-section">
         <h3>Why This Matters</h3>
-        <p>AWS's Well-Architected Framework is the closest thing to a universal standard for evaluating cloud architectures. Even if you work on Azure or GCP, the principles translate. Senior interviewers use these pillars to structure technical conversations.</p>
+        <p>AWS's Well-Architected Framework is the closest thing to a universal standard for evaluating cloud architectures. Even if you work on Azure or GCP, the principles translate directly. It gives you a shared vocabulary with every cloud-literate engineer and interviewer on the planet.</p>
+        <p>More practically: when you join a new company and need to assess an existing system, this framework is your checklist. When you're designing something new, it's your quality gate. When you're in an interview and they ask "how would you evaluate this architecture?" — this is your answer structure.</p>
         <div class="concept-box gold-box">
-          <strong>🎯 Pro Tip:</strong> In any system design interview, you can score major points by saying "Let me walk through this from a Well-Architected perspective..." — it signals structured, mature thinking.
+          <strong>🎯 Pro Tip:</strong> In any system design interview, say "Let me walk through this from a Well-Architected perspective..." It immediately signals structured, mature thinking. Most candidates jump straight to tech choices. You'll stand out by thinking in frameworks.
         </div>
       </div>
 
       <div class="content-section">
-        <h3>The 6 Pillars</h3>
+        <h3>Pillar 1 — 🔧 Operational Excellence</h3>
+        <p>The ability to run and monitor systems effectively, and to continually improve supporting processes and procedures. This is about <em>how you operate</em>, not just what you build.</p>
         <div class="concept-box">
-          <strong>1. 🔧 Operational Excellence</strong><br>
-          Running and monitoring systems to deliver business value, then continually improving processes. Think: IaC, CI/CD, runbooks, post-mortems, and small frequent changes over big risky releases.
+          <strong>Key practices:</strong> Infrastructure as Code (IaC) using Terraform or CloudFormation — so your infrastructure is reproducible and version-controlled. CI/CD pipelines so deployments are automated and consistent. Runbooks for every common incident type. Blameless post-mortems after every outage so you learn rather than blame. Small, frequent deployments rather than large, risky ones.
         </div>
-        <div class="concept-box" style="border-left-color:var(--red)">
-          <strong>2. 🛡️ Security</strong><br>
-          Protecting data, systems, and assets. Key principles: least privilege, defence in depth, encryption everywhere, automated security checks, and treating security as code — not an afterthought.
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The £2M Deployment Mistake</div>
+          A financial services firm deployed a monolith quarterly. Each release was months of work bundled into one giant deployment. When something broke, it was nearly impossible to isolate which change caused it. One quarter a deployment corrupted trading data — it took 4 days to identify the cause. Total cost: £2M in lost trades and remediation. After moving to small daily deployments via a proper CI/CD pipeline, their mean time to detect (MTTD) dropped from days to minutes. Operational Excellence isn't boring — it's directly tied to revenue.
         </div>
-        <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>3. 🔄 Reliability</strong><br>
-          The ability to recover from failures and meet business demand. Covers: circuit breakers, retries with exponential backoff, multi-AZ deployment, automated failover, and chaos engineering.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--purple)">
-          <strong>4. ⚡ Performance Efficiency</strong><br>
-          Using resources efficiently as demand changes. Know when to scale horizontally vs vertically, when caching helps, and how to benchmark. "Right-size" is a senior architect phrase.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--gold)">
-          <strong>5. 💰 Cost Optimization</strong><br>
-          Avoid unnecessary spend. Understand CapEx vs OpEx, Spot vs Reserved vs On-Demand, and always tag your resources for cost visibility. FinOps is a growing discipline.
-        </div>
-        <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>6. 🌱 Sustainability</strong><br>
-          The newest pillar. Minimize environmental impact — choose regions with renewable energy, right-size to reduce waste, optimize for energy efficiency. ESG-conscious companies ask about this.
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Answer:</strong> "For operational excellence I'd implement IaC from day one — probably Terraform — so we can version control our infrastructure. CI/CD via GitHub Actions or Jenkins. Structured logging and distributed tracing so we can actually debug production issues. And a post-mortem culture so every incident generates a concrete improvement."
         </div>
       </div>
 
       <div class="content-section">
-        <h3>How to Apply This in Practice</h3>
-        <p>A Well-Architected Review (WAR) is a structured conversation you run with a team — typically using AWS's questionnaire tool — that produces a report of <strong>high-risk issues</strong> (HRIs) and <strong>medium-risk issues</strong> (MRIs). As a senior SA you'll run these for existing systems.</p>
+        <h3>Pillar 2 — 🛡️ Security</h3>
+        <p>Protecting information, systems, and assets while delivering business value. Security is not a feature you add at the end — it's a design constraint from day one. The principle of <strong>defence in depth</strong> means you layer multiple security controls so that no single failure exposes you.</p>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>Key practices:</strong> Least privilege IAM (nobody gets more permissions than they need). Encryption at rest and in transit — always, no exceptions. Automated security scanning in your CI pipeline (SAST, dependency scanning). Secrets management via AWS Secrets Manager or HashiCorp Vault — never hardcode credentials. WAF in front of public-facing services. VPC with private subnets for anything that doesn't need internet access.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Capital One Breach (2019)</div>
+          A misconfigured WAF allowed an attacker to exploit a Server-Side Request Forgery (SSRF) vulnerability. The attacker hit the EC2 metadata endpoint and retrieved IAM credentials. Those credentials had overly broad permissions — violating least privilege. 100 million customer records were exposed. Fine: $80M. Root causes: two failures of this pillar — WAF misconfiguration and over-privileged IAM roles. Had least privilege been enforced, the stolen credentials would have had almost no useful access.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Answer:</strong> "Security is non-negotiable from day one. I'd enforce least-privilege IAM with permission boundaries, deploy behind a WAF, encrypt everything in transit with TLS 1.2+ and at rest with KMS-managed keys, manage secrets via Secrets Manager, and bake security scanning into the CI pipeline so vulnerabilities are caught before they reach production."
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Pillar 3 — 🔄 Reliability</h3>
+        <p>The ability of a system to recover from failures and continue to function. The key insight here is <strong>design for failure</strong> — assume everything will fail, and build so the system heals itself. In AWS, the unit of resilience is the Availability Zone (AZ). A truly reliable system survives the loss of an entire AZ without user-visible impact.</p>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Key practices:</strong> Multi-AZ deployments for databases and application tiers. Auto-scaling groups that replace failed instances automatically. Circuit breakers to stop cascading failures when a downstream service is struggling. Retries with exponential backoff and jitter (not just naive retries which can create thundering herds). Health checks and automated failover. Regular DR testing — if you've never tested your failover, you don't actually have one.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — AWS us-east-1 Outage</div>
+          In December 2021, AWS us-east-1 had a major outage. Companies that had deployed multi-region or at least multi-AZ with proper failover stayed online. Companies that had assumed a single region would "just work" went down — including some major services that took client-facing dashboards offline for hours. The lesson: reliability requires you to <em>actively</em> design for failure, not passively hope it won't happen.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Answer:</strong> "I'd design for failure from the start: multi-AZ for all stateful components, circuit breakers between services, health checks with automatic replacement of failed instances, and regular chaos engineering — deliberately killing instances in staging to verify recovery procedures actually work."
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Pillar 4 — ⚡ Performance Efficiency</h3>
+        <p>Using computing resources efficiently to meet system requirements, and maintaining that efficiency as demand changes. This is not just about speed — it's about using the <em>right resources</em> for the job.</p>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>Key practices:</strong> Choose the right instance type for the workload — compute-optimised (C-series) for CPU-heavy tasks, memory-optimised (R-series) for in-memory databases, storage-optimised (I-series) for high I/O. Use caching aggressively: CDN for static content, ElastiCache/Redis for hot database queries, in-process caching for repeated computations. Scale horizontally rather than vertically where possible — it's more resilient. Profile before optimising — don't guess where bottlenecks are.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Database That Didn't Need to Scale</div>
+          A SaaS company was spending £8,000/month on a massive RDS instance because their app was slow. A consultant profiled the application and found 80% of the load was 3 specific queries hitting a product catalog — the same 200 products read thousands of times per minute. Adding a Redis cache in front of those 3 queries took 2 days of engineering time. Database CPU dropped from 85% to 12%. They downgraded to a £900/month instance. Performance improvement: 40% faster response times. Cost saving: £7,100/month. This is Performance Efficiency in action.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Pillar 5 — 💰 Cost Optimization</h3>
+        <p>Running systems at the lowest price point while still delivering business value. Cost is a non-functional requirement like any other — ignoring it creates technical debt of a financial kind.</p>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>Key practices:</strong> Right-size instances — the default choice is often too large. Use Reserved Instances or Savings Plans for predictable workloads (up to 72% savings vs On-Demand). Spot Instances for fault-tolerant batch jobs (up to 90% savings). Tag every resource for cost attribution — you can't optimise what you can't measure. Review your bill monthly. Use S3 Intelligent-Tiering for data you access infrequently. Delete unattached EBS volumes, idle NAT gateways, and unused Elastic IPs.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">📖 Real Example — The Zombie Resources</div>
+          A startup conducted their first cloud cost review 18 months after launch. They found: 12 EBS volumes attached to terminated instances (£180/month), a NAT gateway in a region they'd stopped using (£90/month), 3 RDS snapshots being retained indefinitely from a database they'd migrated away from (£240/month), and a dev environment running 24/7 that was only used 8 hours a day (could be scheduled to stop at night, saving £380/month). Total wasted spend found in one afternoon: £890/month. £10,680/year. FinOps is not glamorous but it's very valuable.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Pillar 6 — 🌱 Sustainability</h3>
+        <p>Minimising the environmental impact of running cloud workloads. This is the newest pillar (added 2021) and is increasingly asked about in interviews, especially at companies with ESG commitments or public net-zero targets.</p>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Key practices:</strong> Choose AWS regions powered by renewable energy (eu-west-1 Ireland, eu-central-1 Frankfurt have strong green credentials). Right-size to reduce waste — an idle oversized instance wastes energy. Use managed services (Lambda, Fargate) which have higher utilisation density than dedicated EC2. Consolidate workloads. Delete what you're not using. Graviton (ARM) instances use ~60% less energy than equivalent x86 for the same workload.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Angle:</strong> Most candidates don't mention sustainability at all. Bringing it up proactively — even briefly — signals awareness of the broader picture and is especially impressive at companies with public ESG commitments. Say: "I'd also consider the sustainability pillar — choosing the eu-west-1 region for its renewable energy mix and using Graviton instances where possible for the energy efficiency gains."
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Running a Well-Architected Review (WAR)</h3>
+        <p>A WAR is a structured conversation you run with a team — typically using AWS's questionnaire tool in the console — that produces a report of <strong>High Risk Issues (HRIs)</strong> and <strong>Medium Risk Issues (MRIs)</strong>. You're not looking for perfection — you're looking for the most dangerous gaps.</p>
+        <div class="concept-box">
+          <strong>Typical WAR process:</strong><br>
+          1. Schedule 2-hour session with the team who built and operates the system<br>
+          2. Work through the pillar questions in the AWS WAR Tool (or equivalent)<br>
+          3. Each question asks "do you do X?" — be honest, not aspirational<br>
+          4. Tool produces a risk report with severity ratings<br>
+          5. You produce a prioritised remediation plan — fix HRIs first<br>
+          6. Re-review in 6 months
+        </div>
         <div class="analogy-block">
           <div class="a-label">🧭 Mental Model</div>
-          Think of the 6 pillars as 6 lenses. Every architecture decision you make, look through each lens: "Does this choice make me more or less operationally excellent? More or less secure?" You won't always optimise all 6 simultaneously — that's where trade-offs come in.
+          Think of the 6 pillars as 6 lenses. Every architecture decision you make, look through each lens: "Does this choice make me more or less operationally excellent? More or less secure?" You won't always optimise all 6 simultaneously — that's where trade-offs come in. A startup in week 2 legitimately prioritises speed over reliability. A bank legally cannot. Context always drives weighting.
         </div>
       </div>
 
@@ -1083,38 +1382,91 @@
     <div class="modal-body">
       <div class="content-section">
         <h3>There Is No Perfect Architecture</h3>
-        <p>This is the most important sentence in architecture. Every design decision is a trade-off. The junior SA looks for the "right answer." The senior SA asks "right for whom, when, and at what cost?"</p>
+        <p>This is the most important sentence in architecture. Every design decision is a trade-off. The junior SA looks for the "right answer." The senior SA asks "right for whom, when, and at what cost?" Your entire career progression is learning to make better trade-off decisions faster, with more confidence, and to articulate your reasoning clearly to others.</p>
+        <div class="analogy-block">
+          <div class="a-label">🧭 The Triangle You Can't Escape</div>
+          Engineering has a classic constraint: Fast, Cheap, Good — pick two. Architecture has its own version. For any system, you're constantly balancing: speed to market, reliability, cost, security, and developer experience. Squeezing one almost always expands another. Recognising these tensions early is what separates senior thinking.
+        </div>
       </div>
 
       <div class="content-section">
-        <h3>CAP Theorem — Explained Simply</h3>
-        <p>In any distributed data system, you can only guarantee TWO of these three properties simultaneously:</p>
+        <h3>CAP Theorem — The Foundation</h3>
+        <p>Proposed by Eric Brewer in 2000 and formally proven in 2002, CAP Theorem states that in any distributed data system, you can only guarantee TWO of these three properties simultaneously:</p>
         <div class="pillars-grid" style="grid-template-columns:repeat(3,1fr)">
-          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🔒</div><div class="p-name">Consistency</div><div class="p-desc">Every read gets the most recent write (or an error)</div></div>
-          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">⚡</div><div class="p-name">Availability</div><div class="p-desc">Every request gets a response (maybe not the latest data)</div></div>
-          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">🌐</div><div class="p-name">Partition Tolerance</div><div class="p-desc">System continues despite network partitions</div></div>
+          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🔒</div><div class="p-name">Consistency</div><div class="p-desc">Every read returns the most recent write — or an error. No stale data ever.</div></div>
+          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">⚡</div><div class="p-name">Availability</div><div class="p-desc">Every request gets a response — though it might not contain the latest data.</div></div>
+          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">🌐</div><div class="p-name">Partition Tolerance</div><div class="p-desc">System keeps operating even if some nodes can't communicate with others.</div></div>
         </div>
         <div class="concept-box">
-          <strong>The key insight:</strong> Network partitions are unavoidable in distributed systems. So you're <em>really</em> choosing between CP (consistent but may be unavailable) and AP (available but may return stale data). This is a business decision, not just a technical one.
+          <strong>The critical insight:</strong> Network partitions are not optional in distributed systems — they <em>will</em> happen. Hardware fails, cables get cut, DNS goes wrong. So Partition Tolerance is not really a choice — it's a requirement. That means you're <em>actually</em> choosing between <strong>CP</strong> (sacrifice availability when partitions occur) and <strong>AP</strong> (sacrifice consistency when partitions occur). This is a business decision disguised as a technical one.
         </div>
       </div>
 
       <div class="content-section">
-        <h3>Real-World Examples</h3>
+        <h3>CP vs AP — Real Database Examples</h3>
+        <div class="concept-box" style="border-left-color:var(--accent)">
+          <strong>CP Databases (Consistent + Partition Tolerant):</strong><br>
+          PostgreSQL, MySQL with synchronous replication, MongoDB in strong consistency mode, Apache HBase, DynamoDB in strong consistency mode.<br><br>
+          When a partition occurs, these systems will <em>refuse to serve reads</em> rather than return stale data. Better to say "service unavailable" than to serve wrong data.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>AP Databases (Available + Partition Tolerant):</strong><br>
+          Apache Cassandra, CouchDB, DynamoDB in eventual consistency mode, Riak, DNS itself.<br><br>
+          When a partition occurs, these systems keep responding — but different nodes may return different values until they sync back up. Eventually consistent.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>When to Choose CP vs AP — With Real Examples</h3>
         <div class="concept-box gold-box">
-          <strong>Choose CP (banking, payments, inventory):</strong> A bank account balance must be consistent. Better to return an error than to show a wrong balance. DynamoDB in strong consistency mode, PostgreSQL with synchronous replication.
+          <strong>🏦 Choose CP — Banking & Payments:</strong><br>
+          Imagine two people with access to a joint bank account, each on a different continent. A network partition occurs between the two database nodes. An AP database might allow both to withdraw the last £500 simultaneously — the account is now overdrawn by £500. A CP database refuses one of those transactions until the partition resolves. The cost: a brief service disruption. The alternative cost: financial loss and regulatory breach. Banks always choose CP.
         </div>
-        <div class="concept-box green-box">
-          <strong>Choose AP (social feeds, product catalogs, DNS):</strong> If Twitter is temporarily inconsistent — showing a like count that's 2 seconds stale — nobody cares. But if Twitter goes down, millions are affected. Cassandra, DynamoDB in eventual consistency mode, Couchbase.
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>🛒 Choose AP — Shopping Cart & Product Catalog:</strong><br>
+          Amazon's Dynamo paper (which inspired DynamoDB and Cassandra) specifically describes how Amazon chose AP for their shopping cart. If two clients add items to a cart during a partition, the worst case is they see slightly different versions temporarily. After the partition resolves, the system merges the carts. The alternative — refusing to let customers add to cart during a network hiccup — would cost millions in abandoned purchases. For product catalogs, showing a price that's 2 seconds stale is infinitely better than showing an error.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>🏥 Choose CP — Healthcare Dosage Tracking:</strong><br>
+          A nurse checks a patient's last medication dose before administering another. If the system returns stale data due to a partition (AP behaviour), the patient might receive a double dose. This is a life-safety scenario — the system must be CP. Return an error and have the nurse check the physical chart rather than risk incorrect data. The inconvenience of an error message is always preferable to patient harm.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--muted)">
+          <strong>📱 Choose AP — Social Media Feeds:</strong><br>
+          Twitter, Instagram, Facebook — all AP. When you like a post, the like count across all servers might be inconsistent for a few seconds. Some users see 1,042 likes, others see 1,041. Nobody cares. But if Instagram went down every time there was a network hiccup between their data centres, that would be catastrophic. The business value of availability massively outweighs the cost of momentarily stale like counts.
         </div>
       </div>
 
       <div class="content-section">
-        <h3>The PACELC Extension</h3>
-        <p>PACELC goes further: even when there's NO partition, you still face a trade-off between <strong>latency</strong> and <strong>consistency</strong>. Lower latency = more stale data possible. This is why global databases are genuinely hard.</p>
+        <h3>PACELC — The Full Picture CAP Misses</h3>
+        <p>CAP only describes behaviour during a <em>partition</em>. But systems spend most of their time running normally. PACELC (proposed by Daniel Abadi) extends the model:</p>
+        <div class="concept-box">
+          <strong>PACELC stands for:</strong><br>
+          If there's a <strong>P</strong>artition, choose between <strong>A</strong>vailability and <strong>C</strong>onsistency (the CAP choice).<br>
+          <strong>E</strong>lse (normal operation), choose between <strong>L</strong>atency and <strong>C</strong>onsistency.<br><br>
+          To achieve perfect consistency under normal operation, writes must be acknowledged by <em>all</em> replicas before returning success. That takes time — higher latency. If you want lower latency, you acknowledge the write from one node and let replication happen asynchronously. But now there's a window where a read from another node returns stale data.
+        </div>
         <div class="analogy-block">
-          <div class="a-label">🎓 Interview Tip</div>
-          Mention PACELC after CAP in interviews — it signals you've gone deeper than most. Say: "CAP is the partition scenario, but PACELC reminds us that even under normal operation, latency and consistency compete."
+          <div class="a-label">📖 Real Example — Global Leaderboard</div>
+          A gaming company has a global leaderboard. Their database has nodes in London, Singapore, and New York. A player in Singapore gets a high score. For strict consistency (PACELC/C), the write must reach London and New York before acknowledging success — adding 200ms of latency. For the leaderboard showing globally accurate data within 5 seconds rather than 200ms, that's a bad trade-off. They choose eventual consistency (PACELC/L) — the score propagates within seconds, latency stays under 20ms, and nobody notices the brief inconsistency. This is PACELC thinking applied.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Power Move:</strong> After explaining CAP, say: "CAP describes what happens during a partition, but PACELC reminds us that even under normal operation, latency and consistency are in tension. A globally distributed system is constantly making this trade-off on every write." This alone puts you in the top 10% of candidates.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Other Critical Trade-offs You'll Face Daily</h3>
+        <div class="concept-box">
+          <strong>⚡ Latency vs Throughput:</strong> A system can be optimised for low latency (respond fast to each request) or high throughput (process many requests per second). Batch processing optimises for throughput; real-time APIs optimise for latency. You rarely get both for free.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>🔧 Build vs Buy:</strong> Should you build an authentication system or use Auth0/Cognito? Build a search engine or use Elasticsearch/OpenSearch? The rule of thumb: if it's not your core business differentiator, buy. Every line of code you write is a liability that needs testing, maintaining, and securing. Buying lets your team focus on what makes you unique.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>🔒 Monolith vs Microservices:</strong> Microservices give you independent deployability and scalability — but add enormous operational complexity (service discovery, distributed tracing, network failure handling). Monoliths are simpler to develop and operate — but harder to scale individual components and can become unmaintainable. Amazon, Netflix, and Uber all started as monoliths and split them later. For most teams under 50 engineers, a well-structured monolith is genuinely the better choice.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>💰 Cost vs Performance:</strong> The fastest solution is almost never the cheapest. Caching reduces database load but adds memory cost and cache invalidation complexity. Reserved instances are cheaper than On-Demand but require upfront commitment. Auto-scaling handles peaks but the per-unit cost is higher than a reserved baseline. You're always balancing the cost of a solution against the cost of the problem it solves.
         </div>
       </div>
 
@@ -1149,48 +1501,95 @@
     <div class="modal-body">
       <div class="content-section">
         <h3>Why Diagrams Are a Superpower</h3>
-        <p>A great architecture diagram can align a 20-person team in 10 minutes. A bad one creates confusion for months. As an SA, your ability to communicate visually is as important as your technical knowledge.</p>
+        <p>A great architecture diagram can align a 20-person team in 10 minutes. A bad one creates confusion for months. As an SA, your ability to communicate visually is as important as your technical knowledge — in many roles, more so.</p>
+        <p>Diagrams do three things that words can't: they reveal gaps in your thinking, they expose misalignments between what different people understood, and they create a shared reference point that everyone can point to and discuss. If you can't draw it, you probably don't understand it clearly enough to build it.</p>
         <div class="concept-box">
-          <strong>The Golden Rule:</strong> Different audiences need different levels of abstraction. An executive needs a context diagram. A developer needs a component diagram. Never show the same diagram to both.
+          <strong>The Golden Rule:</strong> Different audiences need different levels of abstraction. An executive needs a context diagram. A developer needs a component diagram. Never show the same diagram to both — it will either confuse the executive or bore the developer.
         </div>
       </div>
 
       <div class="content-section">
-        <h3>The C4 Model — Your Go-To Framework</h3>
-        <p>C4 stands for Context, Container, Component, and Code. It gives you 4 zoom levels for any system:</p>
+        <h3>The C4 Model — Your Professional Standard</h3>
+        <p>Created by Simon Brown, C4 gives you a consistent, audience-appropriate way to describe any software system. The name comes from its four levels of zoom. Think of it like Google Maps — you start from space and zoom in.</p>
         <div class="pillars-grid" style="grid-template-columns:repeat(2,1fr)">
-          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🌍</div><div class="p-name">L1: Context</div><div class="p-desc">Show the system + its users + external systems. For executives and stakeholders.</div></div>
-          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">📦</div><div class="p-name">L2: Container</div><div class="p-desc">Apps, databases, microservices, file stores. For senior engineers and architects.</div></div>
-          <div class="pillar" style="border-color:rgba(168,85,247,0.3)"><div class="p-icon">⚙️</div><div class="p-name">L3: Component</div><div class="p-desc">Internal components of one container. For the team building that service.</div></div>
-          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">💻</div><div class="p-name">L4: Code</div><div class="p-desc">Classes, functions. Rarely needed — usually auto-generated. For devs only.</div></div>
+          <div class="pillar" style="border-color:rgba(0,212,255,0.3)"><div class="p-icon">🌍</div><div class="p-name">L1: Context</div><div class="p-desc">The system + its users + external systems. For executives and stakeholders. Should fit on a single slide.</div></div>
+          <div class="pillar" style="border-color:rgba(255,215,0,0.3)"><div class="p-icon">📦</div><div class="p-name">L2: Container</div><div class="p-desc">Apps, databases, microservices, file stores. For senior engineers and architects. Shows what's running where.</div></div>
+          <div class="pillar" style="border-color:rgba(168,85,247,0.3)"><div class="p-icon">⚙️</div><div class="p-name">L3: Component</div><div class="p-desc">Internal structure of one container. For the team building that specific service.</div></div>
+          <div class="pillar" style="border-color:rgba(0,255,136,0.3)"><div class="p-icon">💻</div><div class="p-name">L4: Code</div><div class="p-desc">Classes and functions. Rarely drawn manually — usually auto-generated from code. For devs only.</div></div>
         </div>
       </div>
 
       <div class="content-section">
-        <h3>Tools You Should Know</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">
-          <span class="tag tag-green">draw.io (free)</span>
-          <span class="tag tag-gold">Lucidchart</span>
-          <span class="tag">Miro</span>
-          <span class="tag">Structurizr (C4 native)</span>
-          <span class="tag">PlantUML (code-based)</span>
-          <span class="tag">Excalidraw (whiteboard)</span>
+        <h3>C4 in Practice — A Real E-Commerce Example</h3>
+        <p>Let's walk through all four levels for an e-commerce platform so you can see exactly what goes in each:</p>
+        <div class="concept-box">
+          <strong>L1 — Context Diagram:</strong><br>
+          One box in the middle: "E-Commerce Platform". Arrows coming in from: "Customer (web browser)", "Customer (mobile app)". Arrows going out to: "Payment Gateway (Stripe)", "Email Service (SendGrid)", "Warehouse Management System (3rd party)". That's it. No databases. No services. No code. Just: what is this system, who uses it, and what does it talk to?
         </div>
-        <div class="concept-box gold-box">
-          <strong>🎯 Interview Whiteboard Tip:</strong> In system design interviews, always start by drawing the context diagram before going into detail. Say "Let me establish the system boundary first." This buys you thinking time AND shows structured thinking.
-        </div>
-      </div>
-
-      <div class="content-section">
-        <h3>The 3 Audiences & What They Need</h3>
-        <div class="concept-box" style="border-left-color:var(--red)">
-          <strong>Executives / C-Suite:</strong> Context diagram only. No technical jargon. Focus on: what the system does, who uses it, and what business value it delivers. Use plain English labels.
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>L2 — Container Diagram:</strong><br>
+          Now zoom into the "E-Commerce Platform" box. Inside, you show: "React SPA (JavaScript, runs in browser)", "API Gateway (AWS, HTTPS)", "Order Service (Node.js, Docker)", "Product Service (Python, Docker)", "User Service (Go, Docker)", "Orders Database (PostgreSQL, AWS RDS)", "Product Cache (Redis, ElastiCache)", "Message Queue (RabbitMQ)". Arrows show how they communicate: Order Service → Orders DB (SQL), Order Service → Message Queue (AMQP), Product Service → Product Cache (Redis protocol).
         </div>
         <div class="concept-box" style="border-left-color:var(--purple)">
-          <strong>Product / Business Analysts:</strong> Container level. Explain flows in terms of user journeys. "When a customer checks out, the Order Service calls the Payment Service, which calls Stripe."
+          <strong>L3 — Component Diagram (Order Service only):</strong><br>
+          Zoom into the Order Service container. Show its internal components: "Order Controller (REST endpoint handler)", "Order Validator (business rules)", "Payment Orchestrator (coordinates with Stripe)", "Order Repository (database access layer)", "Event Publisher (emits events to queue)". Show how they interact internally.
         </div>
         <div class="concept-box" style="border-left-color:var(--green)">
-          <strong>Engineers:</strong> Component level + explicit protocols (REST, gRPC, async queue). Include data formats, ports, auth mechanisms. This is where technical precision matters.
+          <strong>L4 — Code (rarely needed):</strong><br>
+          UML class diagram of the Order Repository class. Which methods it exposes, what it inherits from. Usually auto-generated by your IDE. Almost never drawn by hand in modern practice.
+        </div>
+        <div class="analogy-block">
+          <div class="a-label">💡 Key Insight</div>
+          Notice how each level only adds detail to one box from the previous level. You never jump straight from L1 to L3. This discipline keeps diagrams readable and ensures you're designing top-down, not bottom-up.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Diagramming Tools — What to Use When</h3>
+        <div class="concept-box">
+          <strong>draw.io / diagrams.net (free, recommended to learn on):</strong> Drag-and-drop, works in browser, saves to Google Drive or locally. AWS, Azure, GCP icon libraries built in. This is what most SAs use for day-to-day work.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--gold)">
+          <strong>Lucidchart (paid, enterprise standard):</strong> Real-time collaboration, integrates with Confluence and Jira. If you're at a larger company, this is likely what they use. The interface is similar to draw.io so skills transfer.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>Structurizr (C4-native, code-based):</strong> You define your architecture as code (DSL or Java/C#/Go libraries) and Structurizr renders the diagrams. The major advantage: diagrams stay in sync with code changes and live in version control. This is the gold standard for keeping diagrams up to date — traditional diagrams rot as code evolves.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>Excalidraw (for whiteboards and quick sketches):</strong> Intentionally sketchy-looking, which signals "this is exploratory" rather than "this is final". Great for workshops and early-stage thinking. Very fast to use. Many engineers use it for interview prep whiteboards.
+        </div>
+        <div class="concept-box gold-box">
+          <strong>🎯 Interview Whiteboard Tip:</strong> In system design interviews, always start with a context-level box. Say: "Let me establish the system boundary first — here's the user, here's our system, here are the external dependencies." This signals structured thinking and buys you 90 seconds to think about the harder design questions. Then zoom to L2. You rarely need to go deeper in an interview unless specifically asked.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>Common Diagramming Mistakes to Avoid</h3>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>❌ Mixing abstraction levels:</strong> Showing a "User" box alongside a "PostgreSQL index" in the same diagram. Pick a level and stay there. Mixing levels confuses everyone.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>❌ Unlabelled arrows:</strong> An arrow between two boxes means nothing without a label. What protocol? What data? What direction? "REST/HTTPS", "publishes events", "SQL queries" — always label your arrows.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>❌ No legend or key:</strong> If you use colours or shapes to mean something, say so. Don't make your audience guess that blue boxes are AWS services and green boxes are third-party services.
+        </div>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>❌ The "spaghetti diagram":</strong> Showing every system and every connection in one diagram. After about 7–8 boxes it becomes unreadable. If your diagram has more than 8–10 boxes, it needs to be split into multiple diagrams at different zoom levels.
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>The 3 Audiences — With Script</h3>
+        <p>Knowing which diagram to show is half the battle. Knowing <em>how to talk to it</em> is the other half. Here's how a senior SA would walk through the same system for three different audiences:</p>
+        <div class="concept-box" style="border-left-color:var(--red)">
+          <strong>To the CFO (L1):</strong> "This diagram shows our e-commerce platform at a high level. Customers connect through web and mobile. We process payments through Stripe — that's the orange box. Our warehouse system is on the right — that's a third-party system we integrate with. Everything in the blue box is what our team builds and operates."
+        </div>
+        <div class="concept-box" style="border-left-color:var(--purple)">
+          <strong>To the Product Manager (L2):</strong> "When a customer places an order, it hits our API Gateway, goes to the Order Service here, which validates the order and calls Stripe for payment. If payment succeeds, it publishes an event to this queue. The Fulfilment Service picks that up and creates the shipment. The customer gets an email from SendGrid here."
+        </div>
+        <div class="concept-box" style="border-left-color:var(--green)">
+          <strong>To the Engineering Team (L3):</strong> "Inside the Order Service, the Controller accepts POST /orders. It passes to the Validator which checks business rules. Then the Payment Orchestrator calls Stripe's API — note it uses idempotency keys to prevent double charges. On success, the Order Repository writes to Postgres and the Event Publisher sends to RabbitMQ using the outbox pattern to guarantee delivery even if the queue is down."
         </div>
       </div>
 
